@@ -1,4 +1,4 @@
-.App {
+/* .App {
   text-align: center;
 }
 
@@ -35,4 +35,45 @@
   to {
     transform: rotate(360deg);
   }
+} */
+
+.color-range {
+  position: relative;
+  top: 28px;
+
+  .label {
+    /* border: solid; */
+    content: "";
+    display: inline-block;
+
+    &.r {
+      background: linear-gradient(to right, rgb(255, 255, 255), rgb(255, 0, 0));
+    }
+    &.g {
+      background: linear-gradient(to right, rgb(255, 255, 255), rgb(0, 255, 0));
+    }
+    &.b {
+      background: linear-gradient(to right, rgb(255, 255, 255), rgb(0, 0, 255));
+    }
+  }
+
+  .form-range {
+    position: absolute;
+    z-index: 99;
+    top: 10px;
+  }
+}
+
+.navbar {
+  padding: 0 !important;
+  height: 60px;
+  /* background-color: blue; */
+  text-align: center;
+}
+
+div.color-change {
+  margin: 0 !important;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
 }
