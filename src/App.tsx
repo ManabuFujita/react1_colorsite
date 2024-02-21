@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, Route, Link, Routes, redirect } from 'react-router-dom';
-import { Container, Navbar, Nav, Offcanvas, Button, Row, Col, InputGroup, Card, CardHeader, CardBody, CardText } from 'react-bootstrap';
+import { Container, Navbar, Nav, Offcanvas, Button, Row, Col, InputGroup, Card, CardHeader, CardBody, CardText, ButtonToolbar, ButtonGroup } from 'react-bootstrap';
 import { CompletionInfoFlags } from 'typescript';
 
 import { createUseStyles } from "react-jss";  
@@ -849,8 +849,93 @@ function App() {
     setShowColorBar(newShowColorBar);
   }
 
-  const getColorBarStyle = () => {
+  const getShowAllColorBar = () => {
     return showColorBar ? '' : {style: {display: 'none' }}
+  }
+
+
+
+
+  const [showColorRGB, setShowColorRGB] = useState<boolean>(true);
+  const [showColorHSV, setShowColorHSV] = useState<boolean>(true);
+  const [showColorHSL, setShowColorHSL] = useState<boolean>(true);
+
+  const handleToggleColorButton = (buttonName: string) => {
+    switch (buttonName) {
+      case 'button_rgb':
+        setShowColorRGB(!showColorRGB);
+        break;
+      case 'button_hsv':
+        setShowColorHSV(!showColorHSV);
+        break;
+      case 'button_hsl':
+        setShowColorHSL(!showColorHSL);
+        break;
+      default:
+        break;
+    }
+
+  }
+  const getColorButtonStyle = (buttonName: string) => {
+    switch (buttonName) {
+      case 'button_rgb':
+        return showColorRGB ? {active: true} : {active: false};
+        break;
+      case 'button_hsv':
+        return showColorHSV ? {active: true} : {active: false};
+        break;
+      case 'button_hsl':
+        return showColorHSL ? {active: true} : {active: false};
+        break;
+      default:
+        return {};
+        break;
+    }
+    // return showColorBar ? '' : {style: {display: 'none' }}
+  }
+
+  
+  const getShowColorBar = (colorBarName: string) => {
+    let obj;
+
+
+    switch (colorBarName) {
+      case 'rgb':
+        if (showColorRGB && showColorHSV && showColorHSL) {
+          return {xxl: 12, } 
+        } else if (showColorRGB && !showColorHSV && !showColorHSL) {
+            return {xxl: 12, } 
+        } else if (showColorRGB) {
+          return {xxl: 6, }
+        } else {
+          return {xxl: 6, style: {display: 'none' }}
+        }
+        break;
+
+      case 'hsv':
+        if (!showColorRGB && showColorHSV && !showColorHSL) {
+          return {xxl: 12, } 
+        } else if (showColorHSV) {
+          return {xxl: 6, }
+        } else {
+          return {xxl: 6, style: {display: 'none' }}
+        }
+        break;
+
+      case 'hsl':
+        if (!showColorRGB && !showColorHSV && showColorHSL) {
+          return {xxl: 12, } 
+        } else if (showColorHSL) {
+          return {xxl: 6, }
+        } else {
+          return {xxl: 6, style: {display: 'none' }}
+        }
+        break;
+
+      default:
+        return {};
+        break;
+    }
   }
 
   return (
@@ -904,13 +989,31 @@ function App() {
 
         {/* カラーバー */}
         <Container className='border mt-3'>
-        <Button variant="outline-secondary" size="sm" onClick={() => {handleToggleColorBar()}}>{showColorBar ? "隠す" : "表示"}</Button>
-        <Row {...getColorBarStyle()}>
+
+
+        <ButtonToolbar aria-label="Toolbar with button groups">
+          <ButtonGroup className="me-2" aria-label="First group">
+          <Button variant="outline-secondary" size="sm" onClick={() => {handleToggleColorBar()}}>{showColorBar ? "隠す" : "表示"}</Button>
+
+          </ButtonGroup>
+          <ButtonGroup className="me-2" aria-label="Second group">
+            <Button variant="outline-primary" onClick={() => {handleToggleColorButton('button_rgb')}} {...getColorButtonStyle('button_rgb')}>RGB</Button>
+            <Button variant="outline-primary" onClick={() => {handleToggleColorButton('button_hsv')}} {...getColorButtonStyle('button_hsv')}>HSV</Button>
+            <Button variant="outline-primary" onClick={() => {handleToggleColorButton('button_hsl')}} {...getColorButtonStyle('button_hsl')}>HSL</Button>
+          </ButtonGroup>
+
+        </ButtonToolbar>
+
+
+
+
+        {/* <Button variant="outline-secondary" size="sm" onClick={() => {handleToggleColorBar()}}>{showColorBar ? "隠す" : "表示"}</Button> */}
+        <Row {...getShowAllColorBar()}>
 
           {/* 色変更バー */}
           {/* RGB */}
-          <Col xxl={6}>
-            <Row className="my-4 pb-4 border-bottom" id="rgb">
+          <Col {...getShowColorBar('rgb')}>
+            <Row className="my-2" id="rgb">
 
               <Row className='my-2'>
                 <Col sm={2}>
@@ -966,14 +1069,14 @@ function App() {
           </Col>
 
           {/* HSV */}
-          <Col xxl={6}>
-            <Row className="my-4 pb-4 border-bottom" id="hsv">
+          <Col {...getShowColorBar('hsv')}>
+            <Row className="my-2" id="hsv">
 
               <Row className='my-2'>
                 <Col sm={2}>
                   <form>
                     <label className="form-label">
-                      色相
+                      色相(H)
                       <input type="text" className="form-control" id="hsv-h-text" onChange={() => {}} value={Math.trunc(currentColor.hsv_h)} />
                     </label>
                   </form>
@@ -990,7 +1093,7 @@ function App() {
                 <Col sm={2}>
                   <form>
                     <label className="form-label">
-                      彩度
+                      彩度(S)
                       <input type="text" className="form-control" id="hsv-s-text" onChange={() => {}} value={Math.trunc(currentColor.hsv_s * 1000) / 1000} />
                     </label>
                   </form>
@@ -1007,7 +1110,7 @@ function App() {
                 <Col sm={2}>
                   <form>
                     <label className="form-label">
-                      明るさ
+                      明度(V)
                       <input type="text" className="form-control" id="hsv-v-text" onChange={() => {}} value={Math.trunc(currentColor.hsv_v * 1000) / 1000} />
                     </label>
                   </form>
@@ -1024,13 +1127,14 @@ function App() {
           </Col>
 
           {/* HSL */}
-          <Col xxl={5}>
+          <Col {...getShowColorBar('hsl')}>
             <Row className="my-2" id="hsl">
+
               <Row className='my-2'>
                 <Col sm={2}>
                   <form>
                     <label className="form-label">
-                      色相
+                      色相(H)
                       <input type="text" className="form-control" id="hsl-h-text" onChange={() => {}} value={Math.trunc(currentColor.hsl_h)} />
                     </label>
                   </form>
@@ -1048,7 +1152,7 @@ function App() {
                 <Col sm={2}>
                   <form>
                     <label className="form-label">
-                      彩度
+                      彩度(S)
                       <input type="text" className="form-control" id="hsl-s-text" onChange={() => {}} value={Math.trunc(currentColor.hsl_s * 1000) / 1000} />
                     </label>
                   </form>
@@ -1065,7 +1169,7 @@ function App() {
                 <Col sm={2}>
                   <form>
                     <label className="form-label">
-                      輝度
+                      輝度(L)
                       <input type="text" className="form-control" id="hsl-l-text" onChange={() => {}} value={Math.trunc(currentColor.hsl_l * 1000) / 1000} />
                     </label>
                   </form>
