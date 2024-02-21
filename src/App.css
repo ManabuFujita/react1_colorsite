@@ -77,3 +77,47 @@ div.color-change {
   height: 100%;
   cursor: pointer;
 }
+
+.can-select {
+  border-style: dashed;
+  border-color: lightgray;
+
+
+  &:hover {
+    cursor: pointer;
+    border: solid;
+    border-color: gray;
+  }
+
+}
+
+.can-click {
+  cursor: pointer;
+}
+
+.button-card {
+  width: 28px;
+}
+
+nav.footer {
+  &.footer span {
+    /* display: flex;
+    align-items: center; */
+    text-align: center;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+  }
+  &.footer div {
+    height: 100%;
+    padding: 0;
+  }
+}
+
+.sample-color {
+  cursor: grab;
+}
+
+/* .form-control.hsv {
+  background-color: hsl(164deg, 37%, 90%);
+} */
