@@ -37,6 +37,10 @@
   }
 } */
 
+#header {
+  text-align: left;
+}
+
 .color-range {
   position: relative;
   top: 28px;
@@ -121,3 +125,24 @@ nav.footer {
 /* .form-control.hsv {
   background-color: hsl(164deg, 37%, 90%);
 } */
+
+div.sample-color {
+  /* position: static; */
+}
+
+.sample-color-row {
+  /* position: relative;
+  z-index: 1;
+  height: 100%; */
+  /* width: 100%; */
+  input {
+    /* background-color: red; */
+    /* border-right: none; */
+  }
+
+  button {
+    /* border-left: none; */
+    width: 80px;
+  }
+}
+
