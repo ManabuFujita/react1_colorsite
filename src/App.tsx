@@ -13,6 +13,7 @@ import { Container, Navbar, Nav, Offcanvas, Button, Row, Col, InputGroup, Card, 
 
 import copy from "clipboard-copy"
 import { v4 as uuidv4 } from 'uuid';
+import { get } from 'http';
 
 
 function App() {
@@ -271,19 +272,165 @@ function App() {
       hsl_l: number;
   };
 
+  // 選択したコンポーネント
+  type Component = {
+    id: string;
+    isSampleColor: boolean;
+    isCurrentColor: boolean;
+    isHover: boolean;
+    isClick: boolean;
+    color: Color;
+    isDrag: boolean;
+  }
+
+  const initialCurrentColorsValue = [getRamdomColor(currentColorId), getRamdomColor(uuidv4())];
+  const initialComponentsValue: Component[] = [];
+  const initialCardCountValue = 1;
+
+  // colorの初期値を取得
+  const getInitialCurrentColors = () => {
+    console.log('・getInitialCurrentColors')
+
+    const localCurrentColors = localStorage.getItem('currentColors');
+    if (localCurrentColors !== null) {
+      return JSON.parse(localCurrentColors);
+    } else {
+      return initialCurrentColorsValue;
+    }
+  }
+
+  // componentの初期値を取得
+  const getInitialComponents = () => {
+    console.log('・getInitialComponents')
+
+    const localComponents = localStorage.getItem('components');
+
+// console.log(localComponents)
+
+    if (localComponents !== null) {
+      return JSON.parse(localComponents);
+    } else {
+      return initialComponentsValue;
+    }
+  }
+
+  // cardCountの初期値を取得
+  const getInitialCardCount = () => {
+    console.log('・getInitialCardCount')
+
+    const localCardCount = localStorage.getItem('cardCount');
+    if (localCardCount !== null) {
+      return JSON.parse(localCardCount);
+    } else {
+      return initialCardCountValue;
+    }
+  }
+
+  const [components, setComponents] = useState<Component[]>(getInitialComponents());
+  // const [components, setComponents] = useState<Component[]>([]);
 
   // const [currentColors, setCurrentColors] = useState<Color[]>([getRamdomColor(currentColorId)]);
-  const [currentColors, setCurrentColors] = useState<Color[]>([getRamdomColor(currentColorId), getRamdomColor(uuidv4())]);
+  const [currentColors, setCurrentColors] = useState<Color[]>(getInitialCurrentColors());
+
+  
+  const [cardCount, setCardCount] = useState<number>(getInitialCardCount());
+
+  // ページロード時の処理
+    useEffect(() => {
+      console.log('load page')
+    }, []);
 
   useEffect(() => {
     // 選択箇所の色、サンプルも変更する
     changeClickedColor();
+
+    // localStrageに保存
+    localStorage.setItem('currentColors', JSON.stringify(currentColors));
   }, [currentColors]);
+
+  useEffect(() => {
+      // localStrageに保存
+      localStorage.setItem('components', JSON.stringify(components));
+  }, [components]);
+
+  useEffect(() => {
+    // localStrageに保存
+    localStorage.setItem('cardCount', JSON.stringify(cardCount));
+  }, [cardCount]);
+
+  // localStorageのcurrentColorsをクリア
+  const clearCurrentColors = () => {
+    localStorage.removeItem('currentColors');
+    console.log('◆clearCurrentColors')
+  }
+
+  // localStorageのcomponentsをクリア
+  const clearComponents = () => {
+    localStorage.removeItem('components');
+    console.log('◆clearComponents')
+  }
+
+  // localStorageのcardCountをクリア
+  const clearCardCount = () => {
+    localStorage.removeItem('cardCount');
+    console.log('◆clearCardCount')
+  }
+
+  // localsotrageのcurrentColorsをクリアして、ページをリロード
+  const clearLocalStorageAndReload = () => {
+    // clearCurrentColors();
+
+    // clearCardCount();
+    
+    // clearComponents();
+
+    // setComponents(initialComponentsValue);
+    // setCardCount(initialCardCountValue);
+    // setCurrentColors(initialCurrentColorsValue);
+
+    // componentsのcolorを全て初期化する
+    components.map((component) => {
+      component.color = getRamdomColor(component.id);
+      console.log(component)
+    });
+
+    // // CurrentColorsの色を全て初期化する
+    // setCurrentColors([getRamdomColor(currentColorId), getRamdomColor(uuidv4())]);
+
+    // cardcountを初期化する
+    setCardCount(1);
+
+
+
+    // localStorage.clear(); // 全てのlocalStorageをクリア
+
+    console.log('◆clearLocalStorageAndReload')
+    // console.log(localStorage.getItem('currentColors'))
+    // console.log(localStorage.getItem('components'))
+    // console.log(localStorage.getItem('cardCount'))
+
+    // window.location.reload();
+    // console.log('◆Reloaded')
+
+    //   const reload = async () => {
+    //     await localStorage.clear();
+    //     setTimeout(() => {
+    //       window.location.reload(); // 一定時間後にリロードする
+    //     }, 1000);
+    // }
+
+    // reload();
+
+    // localStorage.clear();
+    // setComponents(getInitialComponents());
+    // setCardCount(getInitialCardCount());
+    // setCurrentColors(getInitialCurrentColors());
+  }
 
   const handleChangeRange = (e: React.ChangeEvent<HTMLInputElement>, colorName: string) => {
     const colorValue = Number(e.target.value);
 
-    // console.log(colorValue);
+    console.log(colorValue);
 
     const clickedComonent = components.find((component) => component.isClick);
 
@@ -298,7 +445,7 @@ function App() {
 
   // sample colorにセットする
   const setRGB = (color: Color) => {
-    console.log(currentColors)
+    // console.log(currentColors)
 
     const deepCopy = currentColors.map((currentColor) => ({ ...currentColor }));
     const newColors = deepCopy.map((currentColor) => {
@@ -361,7 +508,7 @@ function App() {
 
   const changeClickedColor = () => {
 
-    console.log(currentColors[0])
+    // console.log(currentColors[0])
 
     const deepCopy = components.map((component) => ({ ...component }));
     // console.log(deepCopy);
@@ -371,7 +518,7 @@ function App() {
         component.color = currentColors[0];
       }
       if (component.id === currentColorId) {
-        console.log('match')
+        // console.log('match')
         component.color = currentColors[0];
       }
       return component;
@@ -382,28 +529,27 @@ function App() {
 
 
 
-  // 選択したコンポーネント
-  type Component = {
-    id: string;
-    isHover: boolean;
-    isClick: boolean;
-    color: Color;
-    isDrag: boolean;
-  }
-  const [components, setComponents] = useState<Component[]>([]);
 
 
 
-
-  const addComponent = (id: string, color: Color = getRamdomColor(uuidv4())) => {
+  const addComponent = (id: string, 
+    color: Color = getRamdomColor(uuidv4()), 
+    isCurrentColor: boolean = false, 
+    isSampleColor: boolean = false,
+    ) => {
     // idを検索して、無ければオブジェクトを作成する
     let component;
     component = components.find((component) => component.id === id);
+
+
+    console.log('addComponent id:' + id)
 
     if (component === undefined) {
       //新しいComponent作成
       const newComponent: Component = {
         id: id,
+        isCurrentColor: false,
+        isSampleColor: false,
         isHover: false,
         isClick: false,
         isDrag: false,
@@ -411,6 +557,9 @@ function App() {
       };
 
       setComponents([...components, newComponent]);
+
+      // localStrageに保存
+      // localStorage.setItem('components', JSON.stringify(components));
     }
 
     // console.log(components)
@@ -418,6 +567,7 @@ function App() {
 
   const getColorStyle = (id: string) => {
 
+    // componentを検索
     const component = components.find((component) => component.id === id);
 
     let style;
@@ -457,6 +607,7 @@ function App() {
   }
 
   const DivColor = ({...props}) => {
+    console.log('DivColor')
 
     // console.log(props.class)
 
@@ -465,6 +616,8 @@ function App() {
     useEffect(() => {
       // idを検索して、無ければオブジェクトを作成する
       addComponent(id);
+
+
     }, [id, props]);
 
     const style = getColorStyle(id);
@@ -488,11 +641,6 @@ function App() {
       // onDragEnd={(e) => handleDrag(id, false)} 
       onDragOver={(e) => handleDragOver(e, id)} 
       onDrop={(e) => handleDrop(e, id)} 
-
-
-      // {...getEvents({...props}, id)}
-
-      // {...getEvents2}
       >
         { props.children }
       </div>
@@ -500,7 +648,9 @@ function App() {
 
   
   // カード
-  const [cardCount, setCardCount] = useState<number>(1);
+
+
+
 
   const addCard = () => {
     setCardCount(cardCount + 1);
@@ -517,12 +667,11 @@ function App() {
 
     const className = 'card-change';
 
-
-
     let cards;
-    for (let i=0; i<cardCount; i++) {
+    for (let i = 0; i < cardCount; i++) {
       const idHeader = 'card-header-' + (i + 1).toString();
       const idBody = 'card-body-' + (i + 1).toString();
+
       addComponent(idHeader);
       addComponent(idBody);
       const styleHeader = getColorStyle(idHeader);
@@ -593,11 +742,6 @@ function App() {
   const handleClick = (e: React.MouseEvent<HTMLElement>, id: string) => {
     
     console.log('clickStart:' + id)
-
-
-
-    console.log(components)
-
 
     const deepCopy = components.map((component) => ({ ...component }));
     const newComponents = deepCopy.map((component) => {
@@ -793,7 +937,11 @@ function App() {
               {color.id !== currentColorId ? <Button variant="outline-secondary" onClick={() => removeSampleCount(props.e, color.id)}>-</Button> : <Button variant="outline-secondary" disabled></Button>}
               
               {/* カラーバー */}
-              {DivSampleColor({...props}, color.id === currentColorId ? currentColorId : color.id, color)}
+              {DivSampleColor({...props}, 
+                color.id === currentColorId ? currentColorId : color.id, 
+                color, 
+                color.id === currentColorId ? 'change color, save with +' : 'drag and drop', 
+                )}
             </InputGroup>
           </Row>
         </>);
@@ -806,11 +954,11 @@ function App() {
     </>;
   }
 
-  const DivSampleColor = ({...props}, id: string, color: Color) => {
+  const DivSampleColor = ({...props}, id: string, color: Color, text: string) => {
 
     useEffect(() => {
       // idを検索して、無ければオブジェクトを作成する
-      addComponent(id, color);
+      addComponent(id, color, id === currentColorId, true);
     }, [id, props]);
 
     const style = getColorStyle(id);
@@ -823,7 +971,7 @@ function App() {
             id={id} style={style} draggable='true' 
             onDragStart={() => handleDragStart(props.e, id)} 
             onClick={() => handleClick(props.e, id)} >
-              drag and drop
+            {text}
           </InputGroup.Text>
 
           {/* </div> */}
@@ -1090,12 +1238,59 @@ function App() {
     }
   }
 
+  // const ColRGB = ({...props}) => {
+  //   console.log('ColRGB')
+      
+  //   const colors: { [key: string]: number } = {
+  //     'r': currentColors[0].r,
+  //     'g': currentColors[0].g,
+  //     'b': currentColors[0].b,
+  //   }
+
+  //   let list: any = [];
+  //   Object.entries(colors).forEach(([colorName, colorValue]) => {
+  //     list.push(
+  //       <>
+  //       <Row className='my-2'>
+  //         <Col sm={2}>
+  //           <form>
+  //             <label className="form-label">
+  //               {colorName.toUpperCase()}
+  //               <input type="text" className="form-control" id={colorName + "-text"} onChange={() => {}} value={Math.trunc(colorValue)} />
+  //             </label>
+  //           </form>
+  //         </Col>
+  //         <Col sm={10}>
+  //           <Row className='color-range'>
+  //             <div className={'label ' + colorName}>　</div>
+  //             <input type="range" className="form-range" id={colorName} min="0" max="255" step="1" value={colorValue} onChange={(e) => handleChangeRange(e, colorName)}></input>
+  //           </Row>
+  //         </Col>
+  //       </Row>
+  //       </>
+
+  //     );
+  //   });
+
+  //   return <Col {...getShowColorBar('rgb')}>
+  //           {list}
+  //           {props.children}
+  //         </Col>
+  // }
+
   return (
     // <div className="App" onClick={() => {handleClickClear()}}>
     <div className="App">
 
 
       <BrowserRouter>
+      
+{/* 背景テスト */}
+
+{/* <DivColor id='test'>
+          
+        </DivColor> */}
+
 
         {/* ヘッダー */}
         <Navbar bg="dark" variant="dark" expand="lg" fixed="top" id="header2">
@@ -1109,10 +1304,18 @@ function App() {
           </Container> */}
 
 
-            <DivColor id='header' className="header pt-2 navbar-brand float-left">
+            <DivColor id='header' className="header pt-2 navbar-brand ">
               <Container>
-
-                <Navbar.Brand className="ms-3 text-left">{process.env.REACT_APP_TITLE}</Navbar.Brand>
+                <Row>
+                  <Col sm={2}>
+                    <Navbar.Brand>{process.env.REACT_APP_TITLE}</Navbar.Brand>
+                  </Col>
+                  <Col className="ms-auto"></Col>
+                  <Col sm={1}>
+                    {/* localStorageのクリアボタンを右寄せで表示 */}
+                    <Button variant="outline-danger" className="float-right" onClick={() => {clearLocalStorageAndReload()}}>Reset</Button>
+                  </Col>
+                </Row>
               </Container>
 
             </DivColor>
@@ -1139,6 +1342,8 @@ function App() {
             </Nav>
           </Offcanvas.Body>
         </Offcanvas>
+
+
 
         <Container className='mt-5 pt-5'>
 
@@ -1180,7 +1385,7 @@ function App() {
                       </label>
                     </form>
                   </Col>
-                  <Col sm={10}>
+                  <Col sm={10} className='col-color-range'>
                     <Row className='color-range'>
                       <div className='label r'>　</div>
                       <input type="range" className="form-range" id="r" min="0" max="255" step="1" value={currentColors[0].r} onChange={(e) => handleChangeRange(e, 'r')}></input>
@@ -1197,7 +1402,7 @@ function App() {
                       </label>
                     </form>
                   </Col>
-                  <Col sm={10}>
+                  <Col sm={10} className='col-color-range'>
                     <Row className='color-range'>
                       <div className='label g'>　</div>
                       <input type="range" className="form-range" id="g" min="0" max="255" step="1" value={currentColors[0].g} onChange={(e) => handleChangeRange(e, 'g')}></input>
@@ -1214,7 +1419,7 @@ function App() {
                       </label>
                     </form>
                   </Col>
-                  <Col sm={10}>
+                  <Col sm={10} className='col-color-range'>
                     <Row className='color-range'>
                       <div className='label b'>　</div>
                       <input type="range" className="form-range" id="b" min="0" max="255" step="1" value={currentColors[0].b} onChange={(e) => handleChangeRange(e, 'b')}></input>
@@ -1223,6 +1428,8 @@ function App() {
                 </Row>
               </Row>
             </Col>
+
+            {/* <ColRGB /> */}
 
             {/* HSV */}
             <Col {...getShowColorBar('hsv')}>
@@ -1237,7 +1444,7 @@ function App() {
                       </label>
                     </form>
                   </Col>
-                  <Col sm={10}>
+                  <Col sm={10} className='col-color-range'>
                     <Row className='color-range'>
                       <DivColorBar className='label hsv-h' id="label-hsv-h">　</DivColorBar>
                       <input type="range" className="form-range" id="hsv-h" min="0" max="359" step="0.0001" value={currentColors[0].hsv_h} onChange={(e) => handleChangeRange(e, 'hsv_h')}></input>
@@ -1254,7 +1461,7 @@ function App() {
                       </label>
                     </form>
                   </Col>
-                  <Col sm={10}>
+                  <Col sm={10} className='col-color-range'>
                     <Row className='color-range'>
                       <DivColorBar className='label hsv-s' id="label-hsv-s">　</DivColorBar>
                       <input type="range" className="form-range" id="hsv-s" min="0.0001" max="1.001" step="0.001" value={currentColors[0].hsv_s} onChange={(e) => handleChangeRange(e, 'hsv_s')}></input>
@@ -1271,7 +1478,7 @@ function App() {
                       </label>
                     </form>
                   </Col>
-                  <Col sm={10}>
+                  <Col sm={10} className='col-color-range'>
                     <Row className='color-range'>
                       <DivColorBar className='label hsv-v' id="label-hsv-v">　</DivColorBar>
                       <input type="range" className="form-range" id="hsv-v" min="0.0001" max="1.001" step="0.001" value={currentColors[0].hsv_v} onChange={(e) => handleChangeRange(e, 'hsv_v')}></input>
@@ -1295,7 +1502,7 @@ function App() {
                       </label>
                     </form>
                   </Col>
-                  <Col sm={10}>
+                  <Col sm={10} className='col-color-range'>
                     <Row className='color-range'>
                       <DivColorBar className='label hsl-h' id="label-hsl-h">　</DivColorBar>
                       <input type="range" className="form-range" id="hsl-h" min="0" max="359" step="0.0001" value={currentColors[0].hsl_h} onChange={(e) => handleChangeRange(e, 'hsl_h')}></input>
@@ -1313,7 +1520,7 @@ function App() {
                       </label>
                     </form>
                   </Col>
-                  <Col sm={10}>
+                  <Col sm={10} className='col-color-range'>
                     <Row className='color-range'>
                       <DivColorBar className='label hsl-s' id="label-hsl-s">　</DivColorBar>
                       <input type="range" className="form-range" id="hsl-s" min="0.0001" max="1.001" step="0.001" value={currentColors[0].hsl_s} onChange={(e) => handleChangeRange(e, 'hsl_s')}></input>
@@ -1330,7 +1537,7 @@ function App() {
                       </label>
                     </form>
                   </Col>
-                  <Col sm={10}>
+                  <Col sm={10} className='col-color-range'>
                     <Row className='color-range'>
                       <DivColorBar className='label hsl-l' id="label-hsl-l">　</DivColorBar>
                       <input type="range" className="form-range" id="hsl-l" min="0.0001" max="1.001" step="0.001" value={currentColors[0].hsl_l} onChange={(e) => handleChangeRange(e, 'hsl_l')}></input>
@@ -1368,7 +1575,7 @@ onDrop={(e) => handleDrop(id, false)}
 onDragOver={(e) => handleDragOver(id, true)}  */}
       
         {/* test */}
-          <Row className="mt-5" id="body" >
+          {/* <Row className="mt-5" id="body" >
             <Row className='m-2'>
               <DivColor id="body1" className="my-5 py-3">
                 aaa
@@ -1384,7 +1591,7 @@ onDragOver={(e) => handleDragOver(id, true)}  */}
                 ccc
               </DivColor>
             </Row>
-          </Row>
+          </Row> */}
 
         {/* card */}
         <Row className="mt-5" id="card" >

@@ -41,14 +41,18 @@
   text-align: left;
 }
 
+.col-color-range {
+  padding-top: 28px !important;
+}
+
 .color-range {
   position: relative;
-  top: 28px;
+  /* top: 28px; */
 
-  .label {
+  div.label {
     /* border: solid; */
     content: "";
-    display: inline-block;
+    /* display: inline-block; */
 
     &.r {
       background: linear-gradient(to right, rgb(255, 255, 255), rgb(255, 0, 0));
@@ -63,14 +67,14 @@
 
   .form-range {
     position: absolute;
-    z-index: 99;
+    /* z-index: 99; */
     top: 10px;
   }
 }
 
 .navbar {
   padding: 0 !important;
-  height: 60px;
+  /* height: 60px; */
   /* background-color: blue; */
   text-align: center;
 }
@@ -146,3 +150,11 @@ div.sample-color {
   }
 }
 
+#test {
+  position: absolute;
+  width: 100%;
+  min-height: 100vh;
+  top: center;
+  background-color: red;
+  z-index: -1;
+}
