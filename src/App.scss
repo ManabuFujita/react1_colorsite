@@ -37,7 +37,17 @@
   }
 } */
 
+html {
+  height: 100%;
+  font-size: 14px;
+}
+
+body {
+  height: 100%;
+}
+
 #header {
+  height: 100%;
   text-align: left;
 }
 
@@ -75,19 +85,28 @@ nav.footer {
 
 .body-main {
   z-index: -2;
+  padding-bottom: 80px !important;
 }
 
 #body-background {
+  // position: absolute;
   position: absolute;
   width: 100%;
-  min-height: 100vh;
-  top: center;
+  // min-height: 100vh;
+  height: 100vh;
+  top: 70px;
   z-index: 0;
 }
 
 /* カラーバー */
 .color-bars {
   z-index: 1;
+}
+
+.color-space-name {
+  // font-size: large !important;
+  margin-left: 4px;
+  font-weight: bold;
 }
 
 form {
@@ -195,7 +214,7 @@ div.sample-color {
     text-align: right;
 
     button {
-      width: 40px;
+      width: 50%;
     }
 
     .color-count-button-plus {
