@@ -30,10 +30,9 @@ function App() {
     const max = Math.max(color.r, color.g, color.b);
     const min = Math.min(color.r, color.g, color.b);
     
-    // 本当は0を返したいけど、0に初期化されてしまうため、計算エラーにする
-    // if (max === min) {
-    //   return 0.001;
-    // }
+    if (max === min) {
+      return 0;
+    }
 
     let h = 0;
     switch (max) {
@@ -85,10 +84,9 @@ function App() {
     const max = Math.max(color.r, color.g, color.b);
     const min = Math.min(color.r, color.g, color.b);
 
-    // 本当は0を返したいけど、0に初期化されてしまうため、計算エラーにする
-    // if (max === min) {
-    //   return 0.001;
-    // }
+    if (max === min) {
+      return 0;
+    }
 
     let h = 0;
     switch (max) {
@@ -236,7 +234,7 @@ function App() {
   // 色
   const getRamdomColor = (id: string) => {
     // 新しいColor作成
-    const tempColor: Color = {
+    let newColor: Color = {
       id: id,
       r: Math.trunc(Math.random() * 255),
       g: Math.trunc(Math.random() * 255),
@@ -249,8 +247,50 @@ function App() {
       hsl_l: 0,
     };
 
-    let newColor = RGB2HSV(tempColor);
-    newColor = RGB2HSL(tempColor);
+    newColor = RGB2HSV(newColor);
+    newColor = RGB2HSL(newColor);
+
+    return newColor;
+  }
+
+  const getWhiteColor = (id: string) => {
+    // 新しいColor作成
+    let newColor: Color = {
+      id: id,
+      r: 255,
+      g: 255,
+      b: 255,
+      hsv_h: 0,
+      hsv_s: 0,
+      hsv_v: 0,
+      hsl_h: 0,
+      hsl_s: 0,
+      hsl_l: 0,
+    };
+
+    newColor = RGB2HSV(newColor);
+    newColor = RGB2HSL(newColor);
+
+    return newColor;
+  }
+
+  const getHighLuminanceColor = (id: string) => {
+    // 新しいColor作成
+    let newColor: Color = {
+      id: id,
+      r: 0,
+      g: 0,
+      b: 0,
+      hsv_h: 0,
+      hsv_s: 0,
+      hsv_v: 0,
+      hsl_h: Math.random() * 360,
+      hsl_s: Math.random(),
+      hsl_l: 0.99,
+    };
+
+    newColor = HSL2RGB(newColor);
+    newColor = RGB2HSV(newColor);
 
     return newColor;
   }
@@ -327,12 +367,9 @@ function App() {
   }
 
   const [components, setComponents] = useState<Component[]>(getInitialComponents());
-  // const [components, setComponents] = useState<Component[]>([]);
 
-  // const [currentColors, setCurrentColors] = useState<Color[]>([getRamdomColor(currentColorId)]);
   const [currentColors, setCurrentColors] = useState<Color[]>(getInitialCurrentColors());
 
-  
   const [cardCount, setCardCount] = useState<number>(getInitialCardCount());
 
   // ページロード時の処理
@@ -359,72 +396,44 @@ function App() {
   }, [cardCount]);
 
   // localStorageのcurrentColorsをクリア
-  const clearCurrentColors = () => {
-    localStorage.removeItem('currentColors');
-    console.log('◆clearCurrentColors')
-  }
+  // const clearCurrentColors = () => {
+  //   localStorage.removeItem('currentColors');
+  //   console.log('◆clearCurrentColors')
+  // }
 
   // localStorageのcomponentsをクリア
-  const clearComponents = () => {
-    localStorage.removeItem('components');
-    console.log('◆clearComponents')
-  }
+  // const clearComponents = () => {
+  //   localStorage.removeItem('components');
+  //   console.log('◆clearComponents')
+  // }
 
   // localStorageのcardCountをクリア
-  const clearCardCount = () => {
-    localStorage.removeItem('cardCount');
-    console.log('◆clearCardCount')
-  }
+  // const clearCardCount = () => {
+  //   localStorage.removeItem('cardCount');
+  //   console.log('◆clearCardCount')
+  // }
 
-  // localsotrageのcurrentColorsをクリアして、ページをリロード
-  const clearLocalStorageAndReload = () => {
-    // clearCurrentColors();
-
-    // clearCardCount();
-    
-    // clearComponents();
-
-    // setComponents(initialComponentsValue);
-    // setCardCount(initialCardCountValue);
-    // setCurrentColors(initialCurrentColorsValue);
+  // 設定をクリアする
+  const resetPage = () => {
 
     // componentsのcolorを全て初期化する
     components.map((component) => {
-      component.color = getRamdomColor(component.id);
+      component.color = getInitialComponentColor(component.id);
       console.log(component)
     });
 
-    // // CurrentColorsの色を全て初期化する
-    // setCurrentColors([getRamdomColor(currentColorId), getRamdomColor(uuidv4())]);
-
     // cardcountを初期化する
     setCardCount(1);
+  }
 
-
-
-    // localStorage.clear(); // 全てのlocalStorageをクリア
-
-    console.log('◆clearLocalStorageAndReload')
-    // console.log(localStorage.getItem('currentColors'))
-    // console.log(localStorage.getItem('components'))
-    // console.log(localStorage.getItem('cardCount'))
-
-    // window.location.reload();
-    // console.log('◆Reloaded')
-
-    //   const reload = async () => {
-    //     await localStorage.clear();
-    //     setTimeout(() => {
-    //       window.location.reload(); // 一定時間後にリロードする
-    //     }, 1000);
-    // }
-
-    // reload();
-
-    // localStorage.clear();
-    // setComponents(getInitialComponents());
-    // setCardCount(getInitialCardCount());
-    // setCurrentColors(getInitialCurrentColors());
+  const getInitialComponentColor = (id: string) => {
+    switch (id) {
+      case 'body-background':
+        // return getHighLuminanceColor(id);
+        return getWhiteColor(id);
+      default:
+        return getRamdomColor(id);
+    }
   }
 
   const handleChangeRange = (e: React.ChangeEvent<HTMLInputElement>, colorName: string) => {
@@ -535,8 +544,8 @@ function App() {
   const addComponent = (id: string, 
     color: Color = getRamdomColor(uuidv4()), 
     isCurrentColor: boolean = false, 
-    isSampleColor: boolean = false,
-    ) => {
+    isSampleColor: boolean = false,) => {
+      
     // idを検索して、無ければオブジェクトを作成する
     let component;
     component = components.find((component) => component.id === id);
@@ -548,8 +557,8 @@ function App() {
       //新しいComponent作成
       const newComponent: Component = {
         id: id,
-        isCurrentColor: false,
-        isSampleColor: false,
+        isCurrentColor: isCurrentColor,
+        isSampleColor: isSampleColor,
         isHover: false,
         isClick: false,
         isDrag: false,
@@ -557,12 +566,7 @@ function App() {
       };
 
       setComponents([...components, newComponent]);
-
-      // localStrageに保存
-      // localStorage.setItem('components', JSON.stringify(components));
     }
-
-    // console.log(components)
   }
 
   const getColorStyle = (id: string) => {
@@ -615,17 +619,17 @@ function App() {
 
     useEffect(() => {
       // idを検索して、無ければオブジェクトを作成する
-      addComponent(id);
-
+      // if (id === 'body-background') {
+        addComponent(id, getInitialComponentColor(id));
+      // } else {
+      //   addComponent(id);
+      // }
 
     }, [id, props]);
 
     const style = getColorStyle(id);
 
     const className = 'color-change can-select ' + props.className;
-    // クラス名を外から指定できるようにしたい
-
-    // const className = 'color-change can-select ';
 
     // styleを設定してdivタグに変換
     return <div 
@@ -648,10 +652,6 @@ function App() {
 
   
   // カード
-
-
-
-
   const addCard = () => {
     setCardCount(cardCount + 1);
   }
@@ -663,9 +663,9 @@ function App() {
   }
 
   const DivCard = ({...props}) => {
-    const id = String(props.id);
+    // const id = String(props.id);
 
-    const className = 'card-change';
+    // const className = 'card-change';
 
     let cards;
     for (let i = 0; i < cardCount; i++) {
@@ -1286,10 +1286,7 @@ function App() {
       <BrowserRouter>
       
 {/* 背景テスト */}
-
-{/* <DivColor id='test'>
-          
-        </DivColor> */}
+<DivColor id='body-background'></DivColor>
 
 
         {/* ヘッダー */}
@@ -1313,7 +1310,7 @@ function App() {
                   <Col className="ms-auto"></Col>
                   <Col sm={1}>
                     {/* localStorageのクリアボタンを右寄せで表示 */}
-                    <Button variant="outline-danger" className="float-right" onClick={() => {clearLocalStorageAndReload()}}>Reset</Button>
+                    <Button variant="outline-danger" className="float-right" onClick={() => {resetPage()}}>Reset</Button>
                   </Col>
                 </Row>
               </Container>
@@ -1345,7 +1342,7 @@ function App() {
 
 
 
-        <Container className='mt-5 pt-5'>
+        <Container className='mt-5 pt-5 body-main'>
 
         {/* 設定ボタン */}
         <Row>
@@ -1366,7 +1363,7 @@ function App() {
           </ButtonGroup>
         </ButtonToolbar>
 
-        <Container className='border mt-3'>
+        <Container className='border mt-3 color-bars'>
 
           {/* <Button variant="outline-secondary" size="sm" onClick={() => {handleToggleColorBar()}}>{showColorBar ? "隠す" : "表示"}</Button> */}
           <Row {...getShowAllColorBar()}>
@@ -1614,7 +1611,15 @@ onDragOver={(e) => handleDragOver(id, true)}  */}
             {/* <Navbar.Collapse className="justify-content-center"> */}
               {/* <Navbar.Text> */}
                 <DivColor id='footer'>
-                &copy; 2024 My SPA Site. All rights reserved.
+                  <Container>
+                    <Row>
+                      <Col className="ms-auto"></Col>
+                      <Col md={4}>
+                        <span>&copy; 2024 My SPA Site. All rights reserved.</span>
+                      </Col>
+                      <Col className="ms-auto"></Col>
+                    </Row>
+                  </Container>
                 </DivColor>
               {/* </Navbar.Text> */}
             {/* </Navbar.Collapse> */}

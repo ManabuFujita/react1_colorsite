@@ -41,6 +41,59 @@
   text-align: left;
 }
 
+
+.navbar {
+  padding: 0 !important;
+  /* height: 60px; */
+  /* background-color: blue; */
+  text-align: center;
+}
+
+.footer {
+  height: 60px;
+
+}
+
+nav.footer {
+  &.footer span {
+    /* display: flex;
+    align-items: center; */
+    text-align: center;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+  }
+  &.footer div {
+    height: 100%;
+    padding: 0;
+  }
+}
+
+* {
+  z-index: 1;
+}
+
+.body-main {
+  z-index: -2;
+}
+
+#body-background {
+  position: absolute;
+  width: 100%;
+  min-height: 100vh;
+  top: center;
+  z-index: 0;
+}
+
+/* カラーバー */
+.color-bars {
+  z-index: 1;
+}
+
+form {
+  z-index: 2;
+}
+
 .col-color-range {
   padding-top: 28px !important;
 }
@@ -72,13 +125,6 @@
   }
 }
 
-.navbar {
-  padding: 0 !important;
-  /* height: 60px; */
-  /* background-color: blue; */
-  text-align: center;
-}
-
 div.color-change {
   margin: 0 !important;
   width: 100%;
@@ -107,20 +153,7 @@ div.color-change {
   width: 28px;
 }
 
-nav.footer {
-  &.footer span {
-    /* display: flex;
-    align-items: center; */
-    text-align: center;
-    height: 100%;
-    width: 100%;
-    padding: 0;
-  }
-  &.footer div {
-    height: 100%;
-    padding: 0;
-  }
-}
+
 
 .sample-color {
   cursor: grab;
@@ -150,11 +183,3 @@ div.sample-color {
   }
 }
 
-#test {
-  position: absolute;
-  width: 100%;
-  min-height: 100vh;
-  top: center;
-  background-color: red;
-  z-index: -1;
-}
