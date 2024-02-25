@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 // import logo from './logo.svg';
-import './App.css';
+import './App.scss';
 
 import Color from './Color';
 
@@ -14,6 +14,11 @@ import { Container, Navbar, Nav, Offcanvas, Button, Row, Col, InputGroup, Card, 
 import copy from "clipboard-copy"
 import { v4 as uuidv4 } from 'uuid';
 import { get } from 'http';
+import InputGroupText from 'react-bootstrap/esm/InputGroupText';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+import { faCopy } from "@fortawesome/free-regular-svg-icons";
+// import { faCoffee } from "@fortawesome/free-solid-svg-icons";
 
 
 function App() {
@@ -574,11 +579,12 @@ function App() {
     // componentを検索
     const component = components.find((component) => component.id === id);
 
-    let style;
-    if (component === undefined) {
-      style = { backgroundColor: 'blue' };
-    } else {
-      style = { backgroundColor: getHexCodeFromRGB(component.color) };
+    let style = {
+      backgroundColor: 'blue', // 初期値
+      borderRadius: '0%',
+    };
+    if (component !== undefined) {
+      style.backgroundColor = getHexCodeFromRGB(component.color);
 
       if (component.isClick) {
         // クリック時のstyleを追加
@@ -885,8 +891,11 @@ function App() {
     }
   
     return (
-      <Button disabled={isCopied} onClick={handleCopy} className='copy-button' variant="outline-secondary" >
-        {isCopied ? "Copied!" : "Copy"}
+      
+      <Button disabled={isCopied} onClick={handleCopy} className='copy-button' variant="outline-secondary">
+        {/* {isCopied ? "Copied!" : "Copy"} */}
+        {/* <i class="fa-solid fa-copy"></i> */}
+        <FontAwesomeIcon icon={faCopy} />
       </Button>
     )
   }
@@ -895,9 +904,73 @@ function App() {
 
   const DivSampleColors = ({...props}) => {
 
+    // const addSampleCount = (e: React.MouseEvent<HTMLElement>) => {
+    //   // 新規追加時、色はサンプルと同じで、idを新規採番する
+    //   let newColor = {...currentColors[0]};
+    //   newColor.id = uuidv4();
+
+    //   const newCurrentColors = currentColors.map((color) => ({ ...color }));
+
+    //   // 2個目に挿入
+    //   newCurrentColors.splice(1, 0, newColor)
+
+    //   setCurrentColors(newCurrentColors);
+
+    //   if (e !== undefined) {
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    //   }
+    // }
+
+    // const removeSampleCount = (e: React.MouseEvent<HTMLElement>, id: string) => {
+    //   setCurrentColors(currentColors.filter((color) => color.id !== id));
+
+    //   if (e !== undefined) {
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    //   }
+    // }
+
+    const array: any = [];
+    currentColors.map((color, index) => {
+      array.push(
+        <>
+          <Row {...color.id === currentColorId ? {className: 'my-2 pb-3 border-bottom'} : {className: 'my-2'}}>
+
+          <InputGroup className='sample-color-row'>
+
+              <Container>
+                <Row className='sample-color justify-content-md-center'>
+
+                  {/* カラーバー */}
+                  {DivSampleColor({...props}, color)}
+
+                </Row>
+              </Container>
+
+              </InputGroup>
+          </Row>
+        </>);
+    })
+
+    return <>
+      <Container className='my-2'>
+        {array}
+      </Container>
+    </>;
+  }
+
+  const DivSampleColor = ({...props}, color: Color) => {
+
+    const id = color.id === currentColorId ? currentColorId : color.id;
+
+    useEffect(() => {
+      // idを検索して、無ければオブジェクトを作成する
+      addComponent(id, color, id === currentColorId, true);
+    }, [id, props]);
+
+
     const addSampleCount = (e: React.MouseEvent<HTMLElement>) => {
-      
-      
       // 新規追加時、色はサンプルと同じで、idを新規採番する
       let newColor = {...currentColors[0]};
       newColor.id = uuidv4();
@@ -913,8 +986,6 @@ function App() {
         e.preventDefault();
         e.stopPropagation();
       }
-
-
     }
 
     const removeSampleCount = (e: React.MouseEvent<HTMLElement>, id: string) => {
@@ -926,68 +997,47 @@ function App() {
       }
     }
 
-    const array: any = [];
-    currentColors.map((color, index) => {
-      array.push(
-        <>
-          <Row {...color.id === currentColorId ? {className: 'my-2 pb-3 border-bottom'} : {className: 'my-2'}}>
-            <InputGroup className='sample-color-row'>
-              {/* +, - ボタン */}
-              {color.id === currentColorId ? <Button variant="outline-secondary" onClick={() => addSampleCount(props.e)}>+</Button> : <Button variant="outline-secondary" disabled></Button>}
-              {color.id !== currentColorId ? <Button variant="outline-secondary" onClick={() => removeSampleCount(props.e, color.id)}>-</Button> : <Button variant="outline-secondary" disabled></Button>}
-              
-              {/* カラーバー */}
-              {DivSampleColor({...props}, 
-                color.id === currentColorId ? currentColorId : color.id, 
-                color, 
-                color.id === currentColorId ? 'change color, save with +' : 'drag and drop', 
-                )}
-            </InputGroup>
-          </Row>
-        </>);
-    })
-
-    return <>
-      <Container className='my-2'>
-        {array}
-      </Container>
-    </>;
-  }
-
-  const DivSampleColor = ({...props}, id: string, color: Color, text: string) => {
-
-    useEffect(() => {
-      // idを検索して、無ければオブジェクトを作成する
-      addComponent(id, color, id === currentColorId, true);
-    }, [id, props]);
-
     const style = getColorStyle(id);
 
     // styleを設定してdivタグに変換
     return <>
 
-          {/* <Row className='sample-color'> */}
-          <InputGroup.Text className='form-control sample-color' 
-            id={id} style={style} draggable='true' 
-            onDragStart={() => handleDragStart(props.e, id)} 
-            onClick={() => handleClick(props.e, id)} >
-            {text}
-          </InputGroup.Text>
+            <Col className="col color-count-button" md={2}>
+              {/* +, - ボタン */}
+              {color.id === currentColorId 
+                ? <Button variant="outline-secondary" className="color-count-button-plus" onClick={() => addSampleCount(props.e)}>+</Button> 
+                : <Button variant="outline-secondary" className="color-count-button-plus" disabled>　</Button>}
+            {/* </Col>
+            <Col className="col color-count-button" sm={1}> */}
+              {color.id !== currentColorId 
+                ? <Button variant="outline-secondary" className="color-count-button-minus" onClick={() => removeSampleCount(props.e, color.id)}>-</Button> 
+                : <Button variant="outline-secondary" className="color-count-button-minus" disabled>　</Button>}
+            </Col>
 
-          {/* </div> */}
-          {/* <div> */}
-          <Form.Control placeholder="rgb" aria-label="rgb" id={'copy-button-rgb'+id} value={getRGBCodeFromRGB(color)} readOnly />
-          <CopyButton copyText={getRGBCodeFromRGB(color)} inputId={'copy-button-rgb'+id} />
-          {/* </div> */}
+            <Col className="col color-sample" md={3}>
+              <InputGroup.Text className='form-control sample-color' 
+                id={id} 
+                style={style} 
+                draggable='true' 
+                onDragStart={() => handleDragStart(props.e, id)} 
+                onClick={() => handleClick(props.e, id)} >
+                {color.id === currentColorId ? 'change color, save with +' : 'drag and drop'}
+              </InputGroup.Text>
+            </Col>
 
-          {/* <div> */}
-          <Form.Control placeholder="hex" aria-label="hex" id={'copy-button-hex'+id} value={getHexCodeFromRGB(color)} readOnly />
-          <CopyButton copyText={getHexCodeFromRGB(color)} inputId={'copy-button-hex'+id} />
-          {/* </div> */}
-          {/* <div> */}
-          <Form.Control placeholder="hsl" aria-label="hsl" id={'copy-button-hsl'+id} value={getHSLCodeFromRGB(color)} readOnly />
-          <CopyButton copyText={getHSLCodeFromRGB(color)} inputId={'copy-button-hsl'+id} />
-          {/* </Row> */}
+            <Col className="col color-value rgb" md={2}>
+              <Form.Control placeholder="rgb" aria-label="rgb" id={'copy-button-rgb'+id} value={getRGBCodeFromRGB(color)} readOnly />
+              <CopyButton copyText={getRGBCodeFromRGB(color)} inputId={'copy-button-rgb'+id} />
+            </Col>
+            <Col className="col color-value hex" md={2}>
+              <Form.Control placeholder="hex" aria-label="hex" id={'copy-button-hex'+id} value={getHexCodeFromRGB(color)} readOnly />
+              <CopyButton copyText={getHexCodeFromRGB(color)} inputId={'copy-button-hex'+id} />
+            </Col>
+            <Col className="col color-value hsl" md={2}>
+              <Form.Control placeholder="hsl" aria-label="hsl" id={'copy-button-hsl'+id} value={getHSLCodeFromRGB(color)} readOnly />
+              <CopyButton copyText={getHSLCodeFromRGB(color)} inputId={'copy-button-hsl'+id} />
+            </Col>
+
     </>
   };
 
