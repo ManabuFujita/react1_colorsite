@@ -235,6 +235,42 @@ function App() {
 
   // const [currentColors, setCurrentColors] = useState<Color[]>([{id:"aaa", r: 110, g: 120, b: 130, hsv_h: 200, hsv_s: 0.5, hsv_v: 0.7, hsl_h: 200, hsl_s: 0.5, hsl_l: 0.7}]);
 
+  // componentsの初期値を取得
+  const getInitialCurrenctColorComponent = () => {
+    const id = currentColorId;
+    // 新しいColor作成
+    let component: Component = {
+      id: id,
+      isSampleColor: true,
+      isCurrentColor: true,
+      isHover: false,
+      isClick: false,
+      color: getRamdomColor(id),
+      isDrag: false,
+      sampleColorNo: 1,
+    };
+
+    return component;
+  }
+
+  const getInitialRamdomColorComponent = () => {
+    const id = uuidv4();
+    // 新しいColor作成
+    let component: Component = {
+      id: id,
+      isSampleColor: true,
+      isCurrentColor: true,
+      isHover: false,
+      isClick: false,
+      color: getRamdomColor(id),
+      isDrag: false,
+      sampleColorNo: 1,
+    };
+
+    return component;
+  }
+
+
   // 色
   const getRamdomColor = (id: string) => {
     // 新しいColor作成
@@ -325,23 +361,24 @@ function App() {
     isClick: boolean;
     color: Color;
     isDrag: boolean;
+    sampleColorNo: number;
   }
 
-  const initialCurrentColorsValue = [getRamdomColor(currentColorId), getRamdomColor(uuidv4())];
-  const initialComponentsValue: Component[] = [];
+  // const initialCurrentColorsValue = [getRamdomColor(currentColorId), getRamdomColor(uuidv4())];
+  const initialComponentsValue: Component[] = [getInitialCurrenctColorComponent(), getInitialRamdomColorComponent()];
   const initialCardCountValue = 1;
 
   // colorの初期値を取得
-  const getInitialCurrentColors = () => {
-    console.log('・getInitialCurrentColors')
+  // const getInitialCurrentColors = () => {
+  //   console.log('・getInitialCurrentColors')
 
-    const localCurrentColors = localStorage.getItem('currentColors');
-    if (localCurrentColors !== null) {
-      return JSON.parse(localCurrentColors);
-    } else {
-      return initialCurrentColorsValue;
-    }
-  }
+  //   const localCurrentColors = localStorage.getItem('currentColors');
+  //   if (localCurrentColors !== null) {
+  //     return JSON.parse(localCurrentColors);
+  //   } else {
+  //     return initialCurrentColorsValue;
+  //   }
+  // }
 
   // componentの初期値を取得
   const getInitialComponents = () => {
@@ -351,11 +388,15 @@ function App() {
 
 // console.log(localComponents)
 
+    let components: Component[] = [];
+
     if (localComponents !== null) {
-      return JSON.parse(localComponents);
+      components = JSON.parse(localComponents);
     } else {
-      return initialComponentsValue;
+      components = initialComponentsValue;
     }
+
+    return components;
   }
 
   // cardCountの初期値を取得
@@ -372,33 +413,33 @@ function App() {
 
   const [components, setComponents] = useState<Component[]>(getInitialComponents());
 
-  const [currentColors, setCurrentColors] = useState<Color[]>(getInitialCurrentColors());
+  // const [currentColors, setCurrentColors] = useState<Color[]>(getInitialCurrentColors());
 
   const [cardCount, setCardCount] = useState<number>(getInitialCardCount());
 
   // const [appHeight, setAppHeight] = useState<number>(document.documentElement.clientHeight);
 
   // ページロード時の処理
-    useEffect(() => {
-      console.log('load page')
-
-      const onResize = () => {
-        // 画面の高さを再計算
-        // setAppHeight(window.innerHeight);
-        // setAppHeight(document.documentElement.clientHeight);
-        // console.log('appHeight:' + appHeight)
-      }
-      window.addEventListener('resize', onResize);
-      return () => window.removeEventListener('resize', onResize);
-    }, []);
-
   useEffect(() => {
-    // 選択箇所の色、サンプルも変更する
-    changeClickedColor();
+    console.log('load page')
 
-    // localStrageに保存
-    localStorage.setItem('currentColors', JSON.stringify(currentColors));
-  }, [currentColors]);
+    const onResize = () => {
+      // 画面の高さを再計算
+      // setAppHeight(window.innerHeight);
+      // setAppHeight(document.documentElement.clientHeight);
+      // console.log('appHeight:' + appHeight)
+    }
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  // useEffect(() => {
+  //   // 選択箇所の色、サンプルも変更する
+  //   changeClickedColor();
+
+  //   // localStrageに保存
+  //   localStorage.setItem('currentColors', JSON.stringify(currentColors));
+  // }, [currentColors]);
 
   useEffect(() => {
       // localStrageに保存
@@ -440,11 +481,18 @@ function App() {
 
   // 設定をクリアする
   const resetPage = () => {
+    // localStorage.clear();
+
+    // setCardCount(getInitialCardCount());
+    // setComponents(getInitialComponents());
+    // setCurrentColors(getInitialCurrentColors());
+
+
 
     // componentsのcolorを全て初期化する
     components.map((component) => {
       component.color = getInitialComponentColor(component.id);
-      // console.log(component)
+      console.log(component)
     });
 
     // cardcountを初期化する
@@ -464,77 +512,87 @@ function App() {
   const handleChangeRange = (e: React.ChangeEvent<HTMLInputElement>, colorName: string) => {
     const colorValue = Number(e.target.value);
 
-    console.log(colorValue);
+    // console.log(colorValue);
 
     const clickedComonent = components.find((component) => component.isClick);
 
-    // if (clickArea === undefined) {
-    //   alert("クリックしてください");
-    //   return;
-    // }
+    if (clickedComonent === undefined) {
+      // 色の設定値を変更(currentColorのみ)
+      setOneRGBHSV(colorName, colorValue, currentColorId);
+    } else {
+      // 色の設定値を変更(clickcomponentとcurrentColorの両方)
+      setOneRGBHSV(colorName, colorValue, clickedComonent.id);
+    }
+  }
 
-    // 色の設定値を変更
-    setOneRGBHSV(colorName, colorValue, clickedComonent);
+  // componentsからcurrentcolorを取得する
+  const getCurrentColor = () => {
+    const currentColor = components.find((component) => component.isCurrentColor);
+    if (currentColor === undefined) {
+      return getInitialComponentColor(currentColorId);
+    } else {
+      return currentColor.color;
+    }
   }
 
   // sample colorにセットする
   const setRGB = (color: Color) => {
     // console.log(currentColors)
 
-    const deepCopy = currentColors.map((currentColor) => ({ ...currentColor }));
-    const newColors = deepCopy.map((currentColor) => {
-      if (currentColor.id === currentColorId) {
-        currentColor['r'] = color.r;
-        currentColor['g'] = color.g;
-        currentColor['b'] = color.b;
-        currentColor = RGB2HSV(currentColor);
-        currentColor = RGB2HSL(currentColor);
+    const deepCopy = components.map((component) => ({ ...component }));
+    const newComponents = deepCopy.map((component) => {
+      if (component.color.id === currentColorId) {
+        component.color['r'] = color.r;
+        component.color['g'] = color.g;
+        component.color['b'] = color.b;
+        component.color = RGB2HSV(component.color);
+        component.color = RGB2HSL(component.color);
       }
-      return currentColor;
+      return component;
     });
 
-    setCurrentColors(newColors);
+    setComponents(newComponents);
   }
 
-  const setOneRGBHSV = (colorName: string, colorValue: number, component: Component | undefined) => {
+  const setOneRGBHSV = (colorName: string, colorValue: number, componentId: String) => {
 
-    const deepCopy = currentColors.map((color) => ({ ...color }));
-    const newCurrentColors = deepCopy.map((color) => {
-      if (color.id === currentColorId || (component !== undefined && color.id === component.id)) {
+    const deepCopy = components.map((component) => ({ ...component }));
+    const newComponent = deepCopy.map((component) => {
+      if (component.isCurrentColor || component.color.id === componentId) {
 
-        let newColor = color;
+        let newColor = component.color;
         newColor[colorName] = colorValue;
 
         switch (colorName) {
           case 'r':
           case 'g':
           case 'b':
-            color = RGB2HSV(color);
-            color = RGB2HSL(color);
+            component.color = RGB2HSV(component.color);
+            component.color = RGB2HSL(component.color);
             break;
     
           case 'hsv_h':
           case 'hsv_s':
           case 'hsv_v':
-            color = HSV2RGB(color);
-            color = RGB2HSL(color);
+            component.color = HSV2RGB(component.color);
+            component.color = RGB2HSL(component.color);
             break;
     
           case 'hsl_h':
           case 'hsl_s':
           case 'hsl_l':
-            color = HSL2RGB(color);
-            color = RGB2HSV(color);
+            component.color = HSL2RGB(component.color);
+            component.color = RGB2HSV(component.color);
             break;
     
           default:
             break;
         }
       }
-      return color;
+      return component;
     })
 
-    setCurrentColors(newCurrentColors);
+    setComponents(newComponent);
   }
 
 
@@ -542,18 +600,18 @@ function App() {
 
   const changeClickedColor = () => {
 
-    // console.log(currentColors[0])
+    // console.log(getCurrentColor())
 
     const deepCopy = components.map((component) => ({ ...component }));
     // console.log(deepCopy);
 
     const newComponents = deepCopy.map((component) => {
       if (component.isClick) {
-        component.color = currentColors[0];
+        component.color = getCurrentColor();
       }
       if (component.id === currentColorId) {
         // console.log('match')
-        component.color = currentColors[0];
+        component.color = getCurrentColor();
       }
       return component;
     });
@@ -562,7 +620,15 @@ function App() {
   }
 
 
-
+  const getMaxSampleColorNo = () => {
+    let maxSampleColorNo = 0;
+    components.map((component) => {
+      if (component.isSampleColor && component.sampleColorNo > maxSampleColorNo) {
+        maxSampleColorNo = component.sampleColorNo;
+      }
+    });
+    return maxSampleColorNo;
+  }
 
 
 
@@ -588,10 +654,17 @@ function App() {
         isClick: false,
         isDrag: false,
         color: color,
+        sampleColorNo: isSampleColor ? getMaxSampleColorNo() + 1 : -1,
       };
 
       setComponents([...components, newComponent]);
     }
+  }
+
+  const removeComponent = (id: string) => {
+    const newComponents = components.filter((component) => component.id !== id);
+      
+    setComponents(newComponents);
   }
 
   const getColorStyle = (id: string) => {
@@ -855,11 +928,11 @@ function App() {
     // console.log(e.dataTransfer.getData("text/plain"));
 
     console.log('---')
-    console.log(currentColors)
+    console.log(getCurrentColor())
     console.log(draggingColorId)
 
     // ドラッグした色を取得
-    const dragColor = currentColors.find((currentColor) => currentColor.id === draggingColorId)
+    const dragColor = components.find((currentColor) => currentColor.id === draggingColorId)?.color
     console.log(dragColor)
 
     if (dragColor !== undefined) {
@@ -913,25 +986,37 @@ function App() {
     )
   }
 
+  // componentsからsample colorを取得する
+  const getSampleColors = () => {
+    let sampleColors = [];
+
+    const sampleColorsFilter = components.filter((component) => component.isSampleColor);
+    if (sampleColorsFilter === undefined) {
+      sampleColors = getInitialComponents();
+    } else {
+      sampleColors = sampleColorsFilter;
+    }
+
+    return sampleColors;
+  }
 
 
   const DivSampleColors = ({...props}) => {
+    const currentColors = getSampleColors();
 
     const array: any = [];
-    currentColors.map((color, index) => {
+    currentColors.map((component: Component) => {
       array.push(
         <>
-          <Row {...color.id === currentColorId ? {className: 'my-2 pb-3 border-bottom'} : {className: 'my-2'}}>
+          <Row {...component.color.id === currentColorId ? {className: 'my-2 pb-3 border-bottom'} : {className: 'my-2'}}>
 
-          <InputGroup className='sample-color-row'>
+            <InputGroup className='sample-color-row'>
 
               <Container fluid="md">
                 <Row className='sample-color justify-content-end justify-content-md-center'>
 
-
-
                   {/* カラーバー */}
-                  {DivSampleColor({...props}, color)}
+                  {DivSampleColor({...props}, component.color)}
 
                 </Row>
               </Container>
@@ -954,21 +1039,24 @@ function App() {
 
     useEffect(() => {
       // idを検索して、無ければオブジェクトを作成する
-      addComponent(id, color, id === currentColorId, true);
+      // addComponent(id, color, id === currentColorId, true);
     }, [id, props]);
 
 
     const addSampleCount = (e: React.MouseEvent<HTMLElement>) => {
       // 新規追加時、色はサンプルと同じで、idを新規採番する
-      let newColor = {...currentColors[0]};
-      newColor.id = uuidv4();
+      let newColor = {...getCurrentColor()};
+      const id = uuidv4();
+      newColor.id = id;
 
-      const newCurrentColors = currentColors.map((color) => ({ ...color }));
+      // const newComponents = components.map((component) => ({ ...component }));
+
+      addComponent(id, newColor, false, true)
 
       // 2個目に挿入
-      newCurrentColors.splice(1, 0, newColor)
+      // newComponents.push(newColor)
 
-      setCurrentColors(newCurrentColors);
+      // setCurrentColors(newCurrentColors);
 
       if (e !== undefined) {
         e.preventDefault();
@@ -977,7 +1065,11 @@ function App() {
     }
 
     const removeSampleCount = (e: React.MouseEvent<HTMLElement>, id: string) => {
-      setCurrentColors(currentColors.filter((color) => color.id !== id));
+      // setCurrentColors(currentColors.filter((color) => color.id !== id));
+
+      removeComponent(id);
+
+      
 
       if (e !== undefined) {
         e.preventDefault();
@@ -1036,18 +1128,18 @@ function App() {
 
     const className = 'color-bar-change';
 
-    let colorMin = {...currentColors[0]};
-    let colorMax = {...currentColors[0]};
+    let colorMin = {...getCurrentColor()};
+    let colorMax = {...getCurrentColor()};
     let style;
 
     switch (id) {
 
       // HSV
       case "label-hsv-h":
-        let colorv1 = {...currentColors[0]};
-        let colorv2 = {...currentColors[0]};
-        let colorv3 = {...currentColors[0]};
-        let colorv4 = {...currentColors[0]};
+        let colorv1 = {...getCurrentColor()};
+        let colorv2 = {...getCurrentColor()};
+        let colorv3 = {...getCurrentColor()};
+        let colorv4 = {...getCurrentColor()};
         colorv1['hsv_h'] = 0;
         colorv2['hsv_h'] = 90;
         colorv3['hsv_h'] = 180;
@@ -1083,10 +1175,10 @@ function App() {
 
       // HSL
       case "label-hsl-h":
-        let colorl1 = {...currentColors[0]};
-        let colorl2 = {...currentColors[0]};
-        let colorl3 = {...currentColors[0]};
-        let colorl4 = {...currentColors[0]};
+        let colorl1 = {...getCurrentColor()};
+        let colorl2 = {...getCurrentColor()};
+        let colorl3 = {...getCurrentColor()};
+        let colorl4 = {...getCurrentColor()};
         colorl1['hsl_h'] = 0;
         colorl2['hsl_h'] = 90;
         colorl3['hsl_h'] = 180;
@@ -1279,9 +1371,9 @@ function App() {
   //   console.log('ColRGB')
       
   //   const colors: { [key: string]: number } = {
-  //     'r': currentColors[0].r,
-  //     'g': currentColors[0].g,
-  //     'b': currentColors[0].b,
+  //     'r': getCurrentColor().r,
+  //     'g': getCurrentColor().g,
+  //     'b': getCurrentColor().b,
   //   }
 
   //   let list: any = [];
@@ -1422,14 +1514,14 @@ function App() {
                       <form>
                         <label className="form-label">
                           R
-                          <input type="text" className="form-control" id="r-text" onChange={() => {}} value={Math.trunc(currentColors[0].r)} />
+                          <input type="text" className="form-control" id="r-text" onChange={() => {}} value={Math.trunc(getCurrentColor().r)} />
                         </label>
                       </form>
                     </Col>
                     <Col xs={9} md={10} className='col-color-range'>
                       <Row className='color-range'>
                         <div className='label r'>　</div>
-                        <input type="range" className="form-range" id="r" min="0" max="255" step="1" value={currentColors[0].r} onChange={(e) => handleChangeRange(e, 'r')}></input>
+                        <input type="range" className="form-range" id="r" min="0" max="255" step="1" value={getCurrentColor().r} onChange={(e) => handleChangeRange(e, 'r')}></input>
                       </Row>
                     </Col>
                   </Row>
@@ -1439,14 +1531,14 @@ function App() {
                       <form>
                         <label className="form-label">
                           G
-                          <input type="text" className="form-control" id="g-text" onChange={() => {}} value={Math.trunc(currentColors[0].g)} />
+                          <input type="text" className="form-control" id="g-text" onChange={() => {}} value={Math.trunc(getCurrentColor().g)} />
                         </label>
                       </form>
                     </Col>
                     <Col xs={9} md={10} className='col-color-range'>
                       <Row className='color-range'>
                         <div className='label g'>　</div>
-                        <input type="range" className="form-range" id="g" min="0" max="255" step="1" value={currentColors[0].g} onChange={(e) => handleChangeRange(e, 'g')}></input>
+                        <input type="range" className="form-range" id="g" min="0" max="255" step="1" value={getCurrentColor().g} onChange={(e) => handleChangeRange(e, 'g')}></input>
                       </Row>
                     </Col>
                   </Row>
@@ -1456,14 +1548,14 @@ function App() {
                       <form>
                         <label className="form-label">
                           B
-                          <input type="text" className="form-control" id="b-text" onChange={() => {}} value={Math.trunc(currentColors[0].b)} />
+                          <input type="text" className="form-control" id="b-text" onChange={() => {}} value={Math.trunc(getCurrentColor().b)} />
                         </label>
                       </form>
                     </Col>
                     <Col xs={9} md={10} className='col-color-range'>
                       <Row className='color-range'>
                         <div className='label b'>　</div>
-                        <input type="range" className="form-range" id="b" min="0" max="255" step="1" value={currentColors[0].b} onChange={(e) => handleChangeRange(e, 'b')}></input>
+                        <input type="range" className="form-range" id="b" min="0" max="255" step="1" value={getCurrentColor().b} onChange={(e) => handleChangeRange(e, 'b')}></input>
                       </Row>
                     </Col>
                   </Row>
@@ -1488,14 +1580,14 @@ function App() {
                       <form>
                         <label className="form-label">
                           色相(H)
-                          <input type="text" className="form-control" id="hsv-h-text" onChange={() => {}} value={Math.trunc(currentColors[0].hsv_h)} />
+                          <input type="text" className="form-control" id="hsv-h-text" onChange={() => {}} value={Math.trunc(getCurrentColor().hsv_h)} />
                         </label>
                       </form>
                     </Col>
                     <Col xs={9} md={10} className='col-color-range'>
                       <Row className='color-range'>
                         <DivColorBar className='label hsv-h' id="label-hsv-h">　</DivColorBar>
-                        <input type="range" className="form-range" id="hsv-h" min="0" max="359" step="0.0001" value={currentColors[0].hsv_h} onChange={(e) => handleChangeRange(e, 'hsv_h')}></input>
+                        <input type="range" className="form-range" id="hsv-h" min="0" max="359" step="0.0001" value={getCurrentColor().hsv_h} onChange={(e) => handleChangeRange(e, 'hsv_h')}></input>
                       </Row>
                     </Col>
                   </Row>
@@ -1505,14 +1597,14 @@ function App() {
                       <form>
                         <label className="form-label">
                           彩度(S)
-                          <input type="text" className="form-control" id="hsv-s-text" onChange={() => {}} value={Math.trunc(currentColors[0].hsv_s * 1000) / 1000} />
+                          <input type="text" className="form-control" id="hsv-s-text" onChange={() => {}} value={Math.trunc(getCurrentColor().hsv_s * 1000) / 1000} />
                         </label>
                       </form>
                     </Col>
                     <Col xs={9} md={10} className='col-color-range'>
                       <Row className='color-range'>
                         <DivColorBar className='label hsv-s' id="label-hsv-s">　</DivColorBar>
-                        <input type="range" className="form-range" id="hsv-s" min="0.0001" max="1.001" step="0.001" value={currentColors[0].hsv_s} onChange={(e) => handleChangeRange(e, 'hsv_s')}></input>
+                        <input type="range" className="form-range" id="hsv-s" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().hsv_s} onChange={(e) => handleChangeRange(e, 'hsv_s')}></input>
                       </Row>
                     </Col>
                   </Row>
@@ -1522,14 +1614,14 @@ function App() {
                       <form>
                         <label className="form-label">
                           明度(V)
-                          <input type="text" className="form-control" id="hsv-v-text" onChange={() => {}} value={Math.trunc(currentColors[0].hsv_v * 1000) / 1000} />
+                          <input type="text" className="form-control" id="hsv-v-text" onChange={() => {}} value={Math.trunc(getCurrentColor().hsv_v * 1000) / 1000} />
                         </label>
                       </form>
                     </Col>
                     <Col xs={9} md={10} className='col-color-range'>
                       <Row className='color-range'>
                         <DivColorBar className='label hsv-v' id="label-hsv-v">　</DivColorBar>
-                        <input type="range" className="form-range" id="hsv-v" min="0.0001" max="1.001" step="0.001" value={currentColors[0].hsv_v} onChange={(e) => handleChangeRange(e, 'hsv_v')}></input>
+                        <input type="range" className="form-range" id="hsv-v" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().hsv_v} onChange={(e) => handleChangeRange(e, 'hsv_v')}></input>
                       </Row>
                     </Col>
                   </Row>
@@ -1553,14 +1645,14 @@ function App() {
                       <form>
                         <label className="form-label">
                           色相(H)
-                          <input type="text" className="form-control" id="hsl-h-text" onChange={() => {}} value={Math.trunc(currentColors[0].hsl_h)} />
+                          <input type="text" className="form-control" id="hsl-h-text" onChange={() => {}} value={Math.trunc(getCurrentColor().hsl_h)} />
                         </label>
                       </form>
                     </Col>
                     <Col xs={9} md={10} className='col-color-range'>
                       <Row className='color-range'>
                         <DivColorBar className='label hsl-h' id="label-hsl-h">　</DivColorBar>
-                        <input type="range" className="form-range" id="hsl-h" min="0" max="359" step="0.0001" value={currentColors[0].hsl_h} onChange={(e) => handleChangeRange(e, 'hsl_h')}></input>
+                        <input type="range" className="form-range" id="hsl-h" min="0" max="359" step="0.0001" value={getCurrentColor().hsl_h} onChange={(e) => handleChangeRange(e, 'hsl_h')}></input>
                       </Row>
                     </Col>
 
@@ -1571,14 +1663,14 @@ function App() {
                       <form>
                         <label className="form-label">
                           彩度(S)
-                          <input type="text" className="form-control" id="hsl-s-text" onChange={() => {}} value={Math.trunc(currentColors[0].hsl_s * 1000) / 1000} />
+                          <input type="text" className="form-control" id="hsl-s-text" onChange={() => {}} value={Math.trunc(getCurrentColor().hsl_s * 1000) / 1000} />
                         </label>
                       </form>
                     </Col>
                     <Col xs={9} md={10} className='col-color-range'>
                       <Row className='color-range'>
                         <DivColorBar className='label hsl-s' id="label-hsl-s">　</DivColorBar>
-                        <input type="range" className="form-range" id="hsl-s" min="0.0001" max="1.001" step="0.001" value={currentColors[0].hsl_s} onChange={(e) => handleChangeRange(e, 'hsl_s')}></input>
+                        <input type="range" className="form-range" id="hsl-s" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().hsl_s} onChange={(e) => handleChangeRange(e, 'hsl_s')}></input>
                       </Row>
                     </Col>
                   </Row>
@@ -1588,14 +1680,14 @@ function App() {
                       <form>
                         <label className="form-label">
                           輝度(L)
-                          <input type="text" className="form-control" id="hsl-l-text" onChange={() => {}} value={Math.trunc(currentColors[0].hsl_l * 1000) / 1000} />
+                          <input type="text" className="form-control" id="hsl-l-text" onChange={() => {}} value={Math.trunc(getCurrentColor().hsl_l * 1000) / 1000} />
                         </label>
                       </form>
                     </Col>
                     <Col xs={9} md={10} className='col-color-range'>
                       <Row className='color-range'>
                         <DivColorBar className='label hsl-l' id="label-hsl-l">　</DivColorBar>
-                        <input type="range" className="form-range" id="hsl-l" min="0.0001" max="1.001" step="0.001" value={currentColors[0].hsl_l} onChange={(e) => handleChangeRange(e, 'hsl_l')}></input>
+                        <input type="range" className="form-range" id="hsl-l" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().hsl_l} onChange={(e) => handleChangeRange(e, 'hsl_l')}></input>
                       </Row>
                     </Col>
                   </Row>
@@ -1606,7 +1698,7 @@ function App() {
           </Container>
 
 
-          {/* サンプル */}
+          {/* サンプルカラー */}
           <ButtonToolbar aria-label="Toolbar with button groups" className='mt-4'>
             <ButtonGroup className="me-2" aria-label="First group">
               <Button variant="outline-secondary" size="sm" onClick={() => {handleToggleSampleColor()}}>{showSampleColor ? "hide" : "show"}</Button>
