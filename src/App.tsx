@@ -145,6 +145,39 @@ function App() {
     return color;
   }
 
+  // RGB to CMYK
+  const getCMYK_C = (color: Color) => {
+    const k = getCMYK_K(color);
+    const c = (1 - (color.r / 255) - k) / (1 - k);
+    return c;
+  }
+
+  const getCMYK_M = (color: Color) => {
+    const k = getCMYK_K(color);
+    const m = (1 - (color.g / 255) - k) / (1 - k);
+    return m;
+  }
+
+  const getCMYK_Y = (color: Color) => {
+    const k = getCMYK_K(color);
+    const y = (1 - (color.b / 255) - k) / (1 - k);
+    return y;
+  }
+
+  const getCMYK_K = (color: Color) => {
+    const max = Math.max(color.r, color.g, color.b);
+    const k = 1 - (max / 255);
+    return k;
+  }
+
+  const RGB2CMYK = (color: Color) => {
+    color['cmyk_c'] = getCMYK_C(color);
+    color['cmyk_m'] = getCMYK_M(color);
+    color['cmyk_y'] = getCMYK_Y(color);
+    color['cmyk_k'] = getCMYK_K(color);
+    return color;
+  }
+
   // HSV to RGB
   const HSV2RGB = (color: Color) => {
     const max = color.hsv_v * 255;
@@ -229,6 +262,19 @@ function App() {
     return color;
   }
 
+  // CMYK to RGB
+  const CMYK2RGB = (color: Color) => {
+    const r = 255 * (1 - color.cmyk_c) * (1 - color.cmyk_k);
+    const g = 255 * (1 - color.cmyk_m) * (1 - color.cmyk_k);
+    const b = 255 * (1 - color.cmyk_y) * (1 - color.cmyk_k);
+
+    color['r'] = r;
+    color['g'] = g;
+    color['b'] = b;
+
+    return color;
+  }
+
     // const [currentColor, setCurrentColor] = useState<Color>({id:"aaa", r: 110, g: 120, b: 130, hsv_h: 200, hsv_s: 0.5, hsv_v: 0.7, hsl_h: 200, hsl_s: 0.5, hsl_l: 0.7});
   // const [currentColor, setCurrentColor] = useState<Color>(getRamdomColor());
   // const [currentColors, setCurrentColors] = useState<Color[]>([currentColor]);
@@ -262,7 +308,7 @@ function App() {
       isCurrentColor: true,
       isHover: false,
       isClick: false,
-      color: getRamdomColor(id),
+      color: getRamdomGrayScaleColor(id),
       isDrag: false,
       sampleColorNo: 1,
     };
@@ -285,10 +331,42 @@ function App() {
       hsl_h: 0,
       hsl_s: 0,
       hsl_l: 0,
+      cmyk_c: 0,
+      cmyk_m: 0,
+      cmyk_y: 0,
+      cmyk_k: 0,
     };
 
     newColor = RGB2HSV(newColor);
     newColor = RGB2HSL(newColor);
+    newColor = RGB2CMYK(newColor);
+
+    return newColor;
+  }
+
+  const getRamdomGrayScaleColor = (id: string) => {
+    // 新しいColor作成
+    let newColor: Color = {
+      id: id,
+      r: 0,
+      g: 0,
+      b: 0,
+      hsv_h: 0,
+      hsv_s: 0,
+      hsv_v: 0,
+      hsl_h: 0,
+      hsl_s: 0,
+      hsl_l: Math.random(),
+      cmyk_c: 0,
+      cmyk_m: 0,
+      cmyk_y: 0,
+      cmyk_k: 0,
+    };
+
+    newColor = HSL2RGB(newColor);
+
+    newColor = RGB2HSV(newColor);
+    newColor = RGB2CMYK(newColor);
 
     return newColor;
   }
@@ -306,10 +384,15 @@ function App() {
       hsl_h: 0,
       hsl_s: 0,
       hsl_l: 0,
+      cmyk_c: 0,
+      cmyk_m: 0,
+      cmyk_y: 0,
+      cmyk_k: 0,
     };
 
     newColor = RGB2HSV(newColor);
     newColor = RGB2HSL(newColor);
+    newColor = RGB2CMYK(newColor);
 
     return newColor;
   }
@@ -327,10 +410,16 @@ function App() {
       hsl_h: Math.random() * 360,
       hsl_s: Math.random(),
       hsl_l: 0.99,
+      cmyk_c: 0,
+      cmyk_m: 0,
+      cmyk_y: 0,
+      cmyk_k: 0,
     };
 
     newColor = HSL2RGB(newColor);
+
     newColor = RGB2HSV(newColor);
+    newColor = RGB2CMYK(newColor);
 
     return newColor;
   }
@@ -350,6 +439,10 @@ function App() {
       hsl_h: number;
       hsl_s: number;
       hsl_l: number;
+      cmyk_c: number;
+      cmyk_m: number;
+      cmyk_y: number;
+      cmyk_k: number;
   };
 
   // 選択したコンポーネント
@@ -505,7 +598,7 @@ function App() {
         // return getHighLuminanceColor(id);
         return getWhiteColor(id);
       default:
-        return getRamdomColor(id);
+        return getRamdomGrayScaleColor(id);
     }
   }
 
@@ -569,20 +662,35 @@ function App() {
           case 'b':
             component.color = RGB2HSV(component.color);
             component.color = RGB2HSL(component.color);
+            component.color = RGB2CMYK(component.color);
             break;
     
           case 'hsv_h':
           case 'hsv_s':
           case 'hsv_v':
             component.color = HSV2RGB(component.color);
+
             component.color = RGB2HSL(component.color);
+            component.color = RGB2CMYK(component.color);
             break;
     
           case 'hsl_h':
           case 'hsl_s':
           case 'hsl_l':
             component.color = HSL2RGB(component.color);
+
             component.color = RGB2HSV(component.color);
+            component.color = RGB2CMYK(component.color);
+            break;
+
+          case 'cmyk_c':
+          case 'cmyk_m':
+          case 'cmyk_y':
+          case 'cmyk_k':
+            component.color = CMYK2RGB(component.color);
+
+            component.color = RGB2HSV(component.color);
+            component.color = RGB2HSL(component.color);
             break;
     
           default:
@@ -784,14 +892,18 @@ function App() {
     for (let i = 0; i < cardCount; i++) {
       const idHeader = 'card-header-' + (i + 1).toString();
       const idBody = 'card-body-' + (i + 1).toString();
+      const idFooter = 'card-footer-' + (i + 1).toString();
 
       addComponent(idHeader);
       addComponent(idBody);
+      addComponent(idFooter);
       const styleHeader = getColorStyle(idHeader);
       const styleBody = getColorStyle(idBody);
+      const styleFooter = getColorStyle(idFooter);
 
       const card = <div className="col">
-        <Card className='h-100' >
+        {/* <Card className='h-100' > */}
+        <Card className='' >
           <CardHeader className='can-select' 
             onClick={(e) => handleClick(e, idHeader)} 
             onDragStart={(e) => handleDragStart(e, idHeader)} 
@@ -799,7 +911,10 @@ function App() {
             onDragOver={(e) => handleDragOver(e, idHeader)} 
             onDrop={(e) => handleDrop(e, idHeader)} 
             id={'card-header-' + (i + 1).toString()} 
-            style={styleHeader} >title</CardHeader>
+            style={styleHeader} >
+            <CardText>Header</CardText>
+          </CardHeader>
+
           <CardBody className='can-select' 
             onClick={(e) => handleClick(e, idBody)} 
             onDragStart={(e) => handleDragStart(e, idBody)} 
@@ -808,10 +923,20 @@ function App() {
             onDrop={(e) => handleDrop(e, idBody)} 
             id={'card-body-' + (i + 1).toString()} 
             style={styleBody} >
-            <CardText>select</CardText>
-            <CardText>and change color</CardText>
-            {/* <Button>button</Button> */}
+            <CardText>Body</CardText>
+            <CardText>select and change color</CardText>
           </CardBody>
+
+          <Card.Footer className='can-select' 
+            onClick={(e) => handleClick(e, idBody)} 
+            onDragStart={(e) => handleDragStart(e, idBody)} 
+            // onDragEnd={(e) => handleDrag(idBody, false)} 
+            onDragOver={(e) => handleDragOver(e, idBody)} 
+            onDrop={(e) => handleDrop(e, idBody)} 
+            id={'card-footer-' + (i + 1).toString()} 
+            style={styleFooter} >
+            <CardText>Footer</CardText>
+          </Card.Footer>
         </Card>
       </div>;
 
@@ -823,7 +948,8 @@ function App() {
       }
     }
 
-    const html = <div className="row row-cols-1 row-cols-md-4 g-4">{cards}</div>;
+    // const html = <div className="row row-cols-1 row-cols-md-4 g-4">{cards}</div>;
+    const html = <div className="row row-cols-1 g-4">{cards}</div>;
 
     // styleを設定してdivタグに変換
     return html;
@@ -1211,6 +1337,40 @@ function App() {
         style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
         break;
 
+      
+      // CMYK
+      case "label-cmyk-c":
+        colorMin['cmyk_c'] = 0;
+        colorMax['cmyk_c'] = 1;
+        colorMin = CMYK2RGB(colorMin);
+        colorMax = CMYK2RGB(colorMax);
+        style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
+        break;
+
+      case "label-cmyk-m":
+        colorMin['cmyk_m'] = 0;
+        colorMax['cmyk_m'] = 1;
+        colorMin = CMYK2RGB(colorMin);
+        colorMax = CMYK2RGB(colorMax);
+        style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
+        break;
+
+      case "label-cmyk-y":
+        colorMin['cmyk_y'] = 0;
+        colorMax['cmyk_y'] = 1;
+        colorMin = CMYK2RGB(colorMin);
+        colorMax = CMYK2RGB(colorMax);
+        style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
+        break;
+      
+      case "label-cmyk-k":
+        colorMin['cmyk_k'] = 0;
+        colorMax['cmyk_k'] = 1;
+        colorMin = CMYK2RGB(colorMin);
+        colorMax = CMYK2RGB(colorMax);
+        style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
+        break;
+
       default:
         break;
     }
@@ -1286,6 +1446,7 @@ function App() {
   const [showColorRGB, setShowColorRGB] = useState<boolean>(true);
   const [showColorHSV, setShowColorHSV] = useState<boolean>(true);
   const [showColorHSL, setShowColorHSL] = useState<boolean>(true);
+  const [showColorCMYK, setShowColorCMYK] = useState<boolean>(true);
 
   const handleToggleColorButton = (buttonName: string) => {
     switch (buttonName) {
@@ -1297,6 +1458,9 @@ function App() {
         break;
       case 'button_hsl':
         setShowColorHSL(!showColorHSL);
+        break;
+      case 'button_cmyk':
+        setShowColorCMYK(!showColorCMYK);
         break;
       default:
         break;
@@ -1314,6 +1478,9 @@ function App() {
       case 'button_hsl':
         return showColorHSL ? {active: true} : {active: false};
         break;
+      case 'button_cmyk':
+        return showColorCMYK ? {active: true} : {active: false};
+        break;
       default:
         return {};
         break;
@@ -1330,7 +1497,7 @@ function App() {
         if (showColorRGB && showColorHSV && showColorHSL) {
           // 全表示
           return {xxl: 12, className: 'border-bottom'} 
-        } else if (showColorRGB && !showColorHSV && !showColorHSL) {
+        } else if (showColorRGB && !showColorHSV && !showColorHSL && !showColorCMYK) {
           // RGBのみ表示
           return {xxl: 12, } 
         } else if (showColorRGB) {
@@ -1342,7 +1509,7 @@ function App() {
         break;
 
       case 'hsv':
-        if (!showColorRGB && showColorHSV && !showColorHSL) {
+        if (!showColorRGB && showColorHSV && !showColorHSL && !showColorCMYK) {
           return {xxl: 12, } 
         } else if (showColorHSV) {
           return {xxl: 6, }
@@ -1352,9 +1519,19 @@ function App() {
         break;
 
       case 'hsl':
-        if (!showColorRGB && !showColorHSV && showColorHSL) {
+        if (!showColorRGB && !showColorHSV && showColorHSL && !showColorCMYK) {
           return {xxl: 12, } 
         } else if (showColorHSL) {
+          return {xxl: 6, }
+        } else {
+          return {xxl: 6, style: {display: 'none' }}
+        }
+        break;
+
+      case 'cmyk':
+        if (!showColorRGB && !showColorHSV && !showColorHSL && showColorCMYK) {
+          return {xxl: 12, } 
+        } else if (showColorCMYK) {
           return {xxl: 6, }
         } else {
           return {xxl: 6, style: {display: 'none' }}
@@ -1367,45 +1544,6 @@ function App() {
     }
   }
 
-  // const ColRGB = ({...props}) => {
-  //   console.log('ColRGB')
-      
-  //   const colors: { [key: string]: number } = {
-  //     'r': getCurrentColor().r,
-  //     'g': getCurrentColor().g,
-  //     'b': getCurrentColor().b,
-  //   }
-
-  //   let list: any = [];
-  //   Object.entries(colors).forEach(([colorName, colorValue]) => {
-  //     list.push(
-  //       <>
-  //       <Row className='my-2'>
-  //         <Col sm={2}>
-  //           <form>
-  //             <label className="form-label">
-  //               {colorName.toUpperCase()}
-  //               <input type="text" className="form-control" id={colorName + "-text"} onChange={() => {}} value={Math.trunc(colorValue)} />
-  //             </label>
-  //           </form>
-  //         </Col>
-  //         <Col sm={10}>
-  //           <Row className='color-range'>
-  //             <div className={'label ' + colorName}>　</div>
-  //             <input type="range" className="form-range" id={colorName} min="0" max="255" step="1" value={colorValue} onChange={(e) => handleChangeRange(e, colorName)}></input>
-  //           </Row>
-  //         </Col>
-  //       </Row>
-  //       </>
-
-  //     );
-  //   });
-
-  //   return <Col {...getShowColorBar('rgb')}>
-  //           {list}
-  //           {props.children}
-  //         </Col>
-  // }
 
   return (
     // <div className="App" onClick={() => {handleClickClear()}}>
@@ -1416,16 +1554,6 @@ function App() {
 
         {/* ヘッダー */}
         <Navbar bg="dark" variant="dark" expand="lg" fixed="top" id="header2" ref={headerRef}>
-          {/* <Container>
-            <Navbar.Brand as={Link} to="/" className="ms-3">
-              My SPA Site
-            </Navbar.Brand>
-            <Button variant="outline-light" onClick={toggleShow}>
-              Menu
-            </Button>
-          </Container> */}
-
-
             <DivColor id='header' className="header pt-2 navbar-brand ">
               <Container>
                 <Row>
@@ -1439,9 +1567,7 @@ function App() {
                   </Col>
                 </Row>
               </Container>
-
             </DivColor>
-
         </Navbar>
 
 
@@ -1472,6 +1598,8 @@ function App() {
 
 
         <Container className='mt-5 pt-5 body-main' ref={bodyRef}>
+          <Row>
+          <Col xs={12} md={9}>
 
           {/* 設定ボタン */}
           <Row>
@@ -1489,6 +1617,7 @@ function App() {
               <Button variant="outline-primary" size="sm" onClick={() => {handleToggleColorButton('button_rgb')}} {...getColorButtonStyle('button_rgb')}>RGB</Button>
               <Button variant="outline-primary" size="sm" onClick={() => {handleToggleColorButton('button_hsv')}} {...getColorButtonStyle('button_hsv')}>HSV</Button>
               <Button variant="outline-primary" size="sm" onClick={() => {handleToggleColorButton('button_hsl')}} {...getColorButtonStyle('button_hsl')}>HSL</Button>
+              <Button variant="outline-primary" size="sm" onClick={() => {handleToggleColorButton('button_cmyk')}} {...getColorButtonStyle('button_cmyk')}>CMYK</Button>
             </ButtonGroup>
           </ButtonToolbar>
 
@@ -1694,6 +1823,90 @@ function App() {
                 </Row>
               </Col>
 
+              {/* CMYK */}
+              <Col {...getShowColorBar('cmyk')}>
+                <Row className="my-2" id="cmyk">
+
+                  <Row className='my-2'>
+                    <Col xs='auto'>
+                      <FontAwesomeIcon icon={faPalette} />
+                      <span className='color-space-name'>CMYK</span>
+                    </Col>
+                  </Row>
+
+                  <Row className='my-2'>
+                    <Col xs={3} md={2}>
+                      <form>
+                        <label className="form-label">
+                          Cyan
+                          <input type="text" className="form-control" id="cmyk-c-text" onChange={() => {}} value={Math.trunc(getCurrentColor().cmyk_c * 100)} />
+                        </label>
+                      </form>
+                    </Col>
+                    <Col xs={9} md={10} className='col-color-range'>
+                      <Row className='color-range'>
+                        <DivColorBar className='label cmyk-c' id="label-cmyk-c">　</DivColorBar>
+                        <input type="range" className="form-range" id="cmyk-c" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().cmyk_c} onChange={(e) => handleChangeRange(e, 'cmyk_c')}></input>
+                      </Row>
+                    </Col>
+
+                  </Row>
+                  
+                  <Row className='my-2'>
+                   <Col xs={3} md={2}>
+                      <form>
+                        <label className="form-label">
+                          Magenta
+                          <input type="text" className="form-control" id="cmyk-m-text" onChange={() => {}} value={Math.trunc(getCurrentColor().cmyk_m * 100)} />
+                        </label>
+                      </form>
+                    </Col>
+                    <Col xs={9} md={10} className='col-color-range'>
+                      <Row className='color-range'>
+                        <DivColorBar className='label cmyk-m' id="label-cmyk-m">　</DivColorBar>
+                        <input type="range" className="form-range" id="cmyk-m" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().cmyk_m} onChange={(e) => handleChangeRange(e, 'cmyk_m')}></input>
+                      </Row>
+                    </Col>
+                  </Row>
+
+                  <Row className='my-2'>
+                   <Col xs={3} md={2}>
+                      <form>
+                        <label className="form-label">
+                          Yellow
+                          <input type="text" className="form-control" id="cmyk-y-text" onChange={() => {}} value={Math.trunc(getCurrentColor().cmyk_y * 100)} />
+                        </label>
+                      </form>
+                    </Col>
+                    <Col xs={9} md={10} className='col-color-range'>
+                      <Row className='color-range'>
+                        <DivColorBar className='label cmyk-y' id="label-cmyk-y">　</DivColorBar>
+                        <input type="range" className="form-range" id="cmyk-y" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().cmyk_y} onChange={(e) => handleChangeRange(e, 'cmyk_y')}></input>
+                      </Row>
+                    </Col>
+                  </Row>
+
+                  <Row className='my-2'>
+                   <Col xs={3} md={2}>
+                      <form>
+                        <label className="form-label">
+                          Key plate
+                          <input type="text" className="form-control" id="cmyk-k-text" onChange={() => {}} value={Math.trunc(getCurrentColor().cmyk_k * 100)} />
+                        </label>
+                      </form>
+                    </Col>
+                    <Col xs={9} md={10} className='col-color-range'>
+                      <Row className='color-range'>
+                        <DivColorBar className='label cmyk-k' id="label-cmyk-k">　</DivColorBar>
+                        <input type="range" className="form-range" id="cmyk-k" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().cmyk_k} onChange={(e) => handleChangeRange(e, 'cmyk_k')}></input>
+                      </Row>
+                    </Col>
+                  </Row>
+
+
+                </Row>
+              </Col>
+
             </Row>
           </Container>
 
@@ -1739,16 +1952,22 @@ function App() {
               </Row>
             </Row> */}
 
-          {/* card */}
+          </Col>
+
+          <Col xs={12} md={3}>
+
+          {/* カードPattern */}
           <Row className="mt-5" id="card" >
-            <Col sm={2}>
+            <Col sm={12}>
               <Button variant="outline-secondary" size="sm" className='button-card' onClick={removeCard}>-</Button>
-              <span className='mx-2'>card</span>
+              <span className='mx-2'>Pattern</span>
               <Button variant="outline-secondary" size="sm" className='button-card' onClick={addCard}>+</Button>
             </Col>
             <DivCard />
           </Row>
 
+          </Col>
+          </Row>
         </Container>
 
         {/* フッター */}
