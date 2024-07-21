@@ -39,7 +39,6 @@ import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import { faPalette, faBrush } from "@fortawesome/free-solid-svg-icons";
 import { ColorSelectors, DivColorSelector } from './components/ColorSelectors';
 
-import { isClient } from './utils/isClient';
 
 function App() {
 
@@ -140,15 +139,7 @@ function App() {
     setCardCount(1);
   }
 
-  // const getInitialComponentColor = (id: string) => {
-  //   switch (id) {
-  //     case 'body-background':
-  //       // return getHighLuminanceColor(id);
-  //       return getWhiteColor(id);
-  //     default:
-  //       return getRamdomGrayScaleColor(id);
-  //   }
-  // }
+
 
   const handleChangeRange = (e: React.ChangeEvent<HTMLInputElement>, colorName: string) => {
     const colorValue = Number(e.target.value);
@@ -189,17 +180,6 @@ function App() {
 
     setComponents(newComponents);
   }
-
-
-  // const getMaxSampleColorNo = () => {
-  //   let maxSampleColorNo = 0;
-  //   components.map((component) => {
-  //     if (component.isSampleColor && component.sampleColorNo > maxSampleColorNo) {
-  //       maxSampleColorNo = component.sampleColorNo;
-  //     }
-  //   });
-  //   return maxSampleColorNo;
-  // }
 
 
 
@@ -675,11 +655,6 @@ function App() {
         {color.id === currentColorId 
           ? <Button variant="outline-secondary" className="color-count-button-plus" onClick={() => addSampleCount(props.e)}>+</Button> 
           : <Button variant="outline-secondary" className="color-count-button-minus" onClick={() => removeSampleCount(props.e, color.id)}>-</Button>}
-      {/* </Col>
-      <Col className="col color-count-button" xs={1} md={1}> */}
-        {/* {color.id !== currentColorId 
-          ? <Button variant="outline-secondary" className="color-count-button-minus" onClick={() => removeSampleCount(props.e, color.id)}>-</Button> 
-          : <Button variant="outline-secondary" className="color-count-button-minus" disabled>　</Button>} */}
       </Col>
 
       <Col className="col color-sample" xs={10} md={10}>
@@ -997,7 +972,8 @@ function App() {
               <Container>
                 <Row>
                   <Col sm={2}>
-                    <Navbar.Brand>{process.env.REACT_APP_TITLE}</Navbar.Brand>
+                    {/* <Navbar.Brand>{process.env.REACT_APP_TITLE}</Navbar.Brand> */}
+                    <Navbar.Brand>test</Navbar.Brand>
                   </Col>
                   <Col className="ms-auto"></Col>
                   <Col sm={1}>
@@ -1300,7 +1276,6 @@ function App() {
 
               <Container className='border mt-3'>
                 <Row {...getShowSampleColor()}>
-                  {/* <DivSampleColor /> */}
                   <DivSampleColors />
                 </Row>
               </Container>
