@@ -1,23 +1,5 @@
-type ColorObject = {
-  [key: string]: number | string;
-}
+import { Color } from '../types/Color';
 
-export type Color = ColorObject & {
-    id: string;
-    r: number;
-    g: number;
-    b: number;
-    hsv_h: number;
-    hsv_s: number;
-    hsv_v: number;
-    hsl_h: number;
-    hsl_s: number;
-    hsl_l: number;
-    cmyk_c: number;
-    cmyk_m: number;
-    cmyk_y: number;
-    cmyk_k: number;
-};
 
 // RGB to HSV
 const getHSV_H = (color: Color) => {
@@ -333,7 +315,7 @@ export const getRamdomColor = (id: string) => {
   return newColor;
 }
 
-export const getRamdomGrayScaleColor = (id: string) => {
+export const getRamdomGrayScaleColor = (id: string): Color => {
   // 新しいColor作成
   let newColor: Color = {
     id: id,
@@ -360,7 +342,7 @@ export const getRamdomGrayScaleColor = (id: string) => {
   return newColor;
 }
 
-export const getWhiteColor = (id: string) => {
+export const getWhiteColor = (id: string): Color => {
   // 新しいColor作成
   let newColor: Color = {
     id: id,

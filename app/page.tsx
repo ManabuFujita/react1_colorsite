@@ -1,14 +1,25 @@
 "use client";
+
 import React, { useEffect, useRef } from 'react';
 // import logo from './logo.svg';
 // import './App.scss';
 
 // import Color from './components/Color';
-import { Color, RGB2HSV, RGB2HSL, RGB2CMYK, HSV2RGB, HSL2RGB, CMYK2RGB } from './components/ColorFunctions';
+import { RGB2HSV, RGB2HSL, RGB2CMYK, HSV2RGB, HSL2RGB, CMYK2RGB } from './components/ColorFunctions';
 import { getRamdomColor, getRamdomGrayScaleColor, getWhiteColor, getHighLuminanceColor } from './components/ColorFunctions';
 // import { newColorFromRGB, newColorFromHSV, newColorFromHSL, newColorFromCMYK } from './components/ColorFunctions';
 import { changeColor } from './components/ColorFunctions';
 import { getRGBCodeFromRGB, getHexCodeFromRGB, getHSLCodeFromRGB } from './components/ColorFunctions';
+
+import { getSampleColors, getInitialComponents, getCurrentColor, getInitialComponentColor, 
+  getMaxSampleColorNo, setOneRGBHSV, setRGB, 
+  removeComponent,
+  handleToggleColorButton,
+  getColorButtonStyle,
+  getShowColorSelector} from './components/ColorComponents';
+import { addCard, getInitialCardCount, removeCard } from './components/CardComponents';
+import { Component } from './types/Component';
+import { Color } from './types/Color';
 
 
 import { useState } from 'react';
@@ -26,7 +37,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import { faPalette, faBrush } from "@fortawesome/free-solid-svg-icons";
-import { ColorBars } from './components/ColorBars';
+import { ColorSelectors, DivColorSelector } from './components/ColorSelectors';
+
+import { isClient } from './utils/isClient';
 
 function App() {
 
@@ -38,116 +51,6 @@ function App() {
   const currentColorId = 'sample-color';
 
 
-
-
-
-  
-
-    // const [currentColor, setCurrentColor] = useState<Color>({id:"aaa", r: 110, g: 120, b: 130, hsv_h: 200, hsv_s: 0.5, hsv_v: 0.7, hsl_h: 200, hsl_s: 0.5, hsl_l: 0.7});
-  // const [currentColor, setCurrentColor] = useState<Color>(getRamdomColor());
-  // const [currentColors, setCurrentColors] = useState<Color[]>([currentColor]);
-
-  // const [currentColors, setCurrentColors] = useState<Color[]>([{id:"aaa", r: 110, g: 120, b: 130, hsv_h: 200, hsv_s: 0.5, hsv_v: 0.7, hsl_h: 200, hsl_s: 0.5, hsl_l: 0.7}]);
-
-  // componentsの初期値を取得
-  const getInitialCurrenctColorComponent = () => {
-    const id = currentColorId;
-    // 新しいColor作成
-    let component: Component = {
-      id: id,
-      isSampleColor: true,
-      isCurrentColor: true,
-      isHover: false,
-      isClick: false,
-      color: getRamdomColor(id),
-      isDrag: false,
-      sampleColorNo: 1,
-    };
-
-    return component;
-  }
-
-  const getInitialRamdomColorComponent = () => {
-    const id = uuidv4();
-    // 新しいColor作成
-    let component: Component = {
-      id: id,
-      isSampleColor: true,
-      isCurrentColor: true,
-      isHover: false,
-      isClick: false,
-      color: getRamdomGrayScaleColor(id),
-      isDrag: false,
-      sampleColorNo: 1,
-    };
-
-    return component;
-  }
-
-
-
-
-
-
-
-  // 選択したコンポーネント
-  type Component = {
-    id: string;
-    isSampleColor: boolean;
-    isCurrentColor: boolean;
-    isHover: boolean;
-    isClick: boolean;
-    color: Color;
-    isDrag: boolean;
-    sampleColorNo: number;
-  }
-
-  // const initialCurrentColorsValue = [getRamdomColor(currentColorId), getRamdomColor(uuidv4())];
-  const initialComponentsValue: Component[] = [getInitialCurrenctColorComponent(), getInitialRamdomColorComponent()];
-  const initialCardCountValue = 1;
-
-  // colorの初期値を取得
-  // const getInitialCurrentColors = () => {
-  //   console.log('・getInitialCurrentColors')
-
-  //   const localCurrentColors = localStorage.getItem('currentColors');
-  //   if (localCurrentColors !== null) {
-  //     return JSON.parse(localCurrentColors);
-  //   } else {
-  //     return initialCurrentColorsValue;
-  //   }
-  // }
-
-  // componentの初期値を取得
-  const getInitialComponents = () => {
-    console.log('・getInitialComponents')
-
-    const localComponents = localStorage.getItem('components');
-
-// console.log(localComponents)
-
-    let components: Component[] = [];
-
-    if (localComponents !== null) {
-      components = JSON.parse(localComponents);
-    } else {
-      components = initialComponentsValue;
-    }
-
-    return components;
-  }
-
-  // cardCountの初期値を取得
-  const getInitialCardCount = () => {
-    console.log('・getInitialCardCount')
-
-    const localCardCount = localStorage.getItem('cardCount');
-    if (localCardCount !== null) {
-      return JSON.parse(localCardCount);
-    } else {
-      return initialCardCountValue;
-    }
-  }
 
   const [components, setComponents] = useState<Component[]>(getInitialComponents());
 
@@ -237,15 +140,15 @@ function App() {
     setCardCount(1);
   }
 
-  const getInitialComponentColor = (id: string) => {
-    switch (id) {
-      case 'body-background':
-        // return getHighLuminanceColor(id);
-        return getWhiteColor(id);
-      default:
-        return getRamdomGrayScaleColor(id);
-    }
-  }
+  // const getInitialComponentColor = (id: string) => {
+  //   switch (id) {
+  //     case 'body-background':
+  //       // return getHighLuminanceColor(id);
+  //       return getWhiteColor(id);
+  //     default:
+  //       return getRamdomGrayScaleColor(id);
+  //   }
+  // }
 
   const handleChangeRange = (e: React.ChangeEvent<HTMLInputElement>, colorName: string) => {
     const colorValue = Number(e.target.value);
@@ -256,103 +159,11 @@ function App() {
 
     if (clickedComonent === undefined) {
       // 色の設定値を変更(currentColorのみ)
-      setOneRGBHSV(colorName, colorValue, currentColorId);
+      setOneRGBHSV(colorName, colorValue, currentColorId, components, setComponents);
     } else {
       // 色の設定値を変更(clickcomponentとcurrentColorの両方)
-      setOneRGBHSV(colorName, colorValue, clickedComonent.id);
+      setOneRGBHSV(colorName, colorValue, clickedComonent.id, components, setComponents);
     }
-  }
-
-  // componentsからcurrentcolorを取得する
-  const getCurrentColor = () => {
-    const currentColor = components.find((component) => component.isCurrentColor);
-    if (currentColor === undefined) {
-      return getInitialComponentColor(currentColorId);
-    } else {
-      return currentColor.color;
-    }
-  }
-
-  // sample colorにセットする
-  const setRGB = (color: Color) => {
-    // console.log(currentColors)
-
-    const deepCopy = components.map((component) => ({ ...component }));
-    const newComponents = deepCopy.map((component) => {
-      if (component.color.id === currentColorId) {
-        component.color['r'] = color.r;
-        component.color['g'] = color.g;
-        component.color['b'] = color.b;
-        component.color = RGB2HSV(component.color);
-        component.color = RGB2HSL(component.color);
-      }
-      return component;
-    });
-
-    setComponents(newComponents);
-  }
-
-  const setOneRGBHSV = (colorName: string, colorValue: number, componentId: String) => {
-
-    const deepCopy = components.map((component) => ({ ...component }));
-    const newComponent = deepCopy.map((component) => {
-      if (component.isCurrentColor || component.color.id === componentId) {
-
-        let newColor = component.color;
-        newColor[colorName] = colorValue;
-
-        component.color = changeColor(colorName, component.color);
-
-
-        // switch (colorName) {
-        //   case 'r':
-        //   case 'g':
-        //   case 'b':
-        //     // component.color = RGB2HSV(component.color);
-        //     // component.color = RGB2HSL(component.color);
-        //     // component.color = RGB2CMYK(component.color);
-        //     component.color = newColorFromRGB(component.color);
-        //     break;
-    
-        //   case 'hsv_h':
-        //   case 'hsv_s':
-        //   case 'hsv_v':
-        //     // component.color = HSV2RGB(component.color);
-
-        //     // component.color = RGB2HSL(component.color);
-        //     // component.color = RGB2CMYK(component.color);
-        //     component.color = newColorFromHSV(component.color);
-        //     break;
-    
-        //   case 'hsl_h':
-        //   case 'hsl_s':
-        //   case 'hsl_l':
-        //     // component.color = HSL2RGB(component.color);
-
-        //     // component.color = RGB2HSV(component.color);
-        //     // component.color = RGB2CMYK(component.color);
-        //     component.color = newColorFromHSL(component.color);
-        //     break;
-
-        //   case 'cmyk_c':
-        //   case 'cmyk_m':
-        //   case 'cmyk_y':
-        //   case 'cmyk_k':
-        //     // component.color = CMYK2RGB(component.color);
-
-        //     // component.color = RGB2HSV(component.color);
-        //     // component.color = RGB2HSL(component.color);
-        //     component.color = newColorFromCMYK(component.color);
-        //     break;
-    
-        //   default:
-        //     break;
-        // }
-      }
-      return component;
-    })
-
-    setComponents(newComponent);
   }
 
 
@@ -367,11 +178,11 @@ function App() {
 
     const newComponents = deepCopy.map((component) => {
       if (component.isClick) {
-        component.color = getCurrentColor();
+        component.color = getCurrentColor(components);
       }
       if (component.id === currentColorId) {
         // console.log('match')
-        component.color = getCurrentColor();
+        component.color = getCurrentColor(components);
       }
       return component;
     });
@@ -380,15 +191,15 @@ function App() {
   }
 
 
-  const getMaxSampleColorNo = () => {
-    let maxSampleColorNo = 0;
-    components.map((component) => {
-      if (component.isSampleColor && component.sampleColorNo > maxSampleColorNo) {
-        maxSampleColorNo = component.sampleColorNo;
-      }
-    });
-    return maxSampleColorNo;
-  }
+  // const getMaxSampleColorNo = () => {
+  //   let maxSampleColorNo = 0;
+  //   components.map((component) => {
+  //     if (component.isSampleColor && component.sampleColorNo > maxSampleColorNo) {
+  //       maxSampleColorNo = component.sampleColorNo;
+  //     }
+  //   });
+  //   return maxSampleColorNo;
+  // }
 
 
 
@@ -414,18 +225,18 @@ function App() {
         isClick: false,
         isDrag: false,
         color: color,
-        sampleColorNo: isSampleColor ? getMaxSampleColorNo() + 1 : -1,
+        sampleColorNo: isSampleColor ? getMaxSampleColorNo(components) + 1 : -1,
       };
 
       setComponents([...components, newComponent]);
     }
   }
 
-  const removeComponent = (id: string) => {
-    const newComponents = components.filter((component) => component.id !== id);
+  // const removeComponent = (id: string) => {
+  //   const newComponents = components.filter((component) => component.id !== id);
       
-    setComponents(newComponents);
-  }
+  //   setComponents(newComponents);
+  // }
 
   const getColorStyle = (id: string) => {
 
@@ -524,16 +335,16 @@ function App() {
   };
 
   
-  // カード
-  const addCard = () => {
-    setCardCount(cardCount + 1);
-  }
+  // // カード
+  // const addCard = () => {
+  //   setCardCount(cardCount + 1);
+  // }
 
-  const removeCard = () => {
-    if (cardCount > 0) {
-      setCardCount(cardCount - 1);
-    }
-  }
+  // const removeCard = () => {
+  //   if (cardCount > 0) {
+  //     setCardCount(cardCount - 1);
+  //   }
+  // }
 
   const DivCard = ({...props}) => {
     // const id = String(props.id);
@@ -623,7 +434,7 @@ function App() {
         component.isClick = !component.isClick; // トグル操作
 
         // 選択したコンポーネントの色を入力欄にセット
-        setRGB(component.color);
+        setRGB(component.color, components, setComponents);
 
       } else {
         component.isClick = false;
@@ -706,7 +517,7 @@ function App() {
     // console.log(e.dataTransfer.getData("text/plain"));
 
     console.log('---')
-    console.log(getCurrentColor())
+    console.log(getCurrentColor(components))
     console.log(draggingColorId)
 
     // ドラッグした色を取得
@@ -764,23 +575,23 @@ function App() {
     )
   }
 
-  // componentsからsample colorを取得する
-  const getSampleColors = () => {
-    let sampleColors = [];
+  // // componentsからsample colorを取得する
+  // const getSampleColors = () => {
+  //   let sampleColors = [];
 
-    const sampleColorsFilter = components.filter((component) => component.isSampleColor);
-    if (sampleColorsFilter === undefined) {
-      sampleColors = getInitialComponents();
-    } else {
-      sampleColors = sampleColorsFilter;
-    }
+  //   const sampleColorsFilter = components.filter((component) => component.isSampleColor);
+  //   if (sampleColorsFilter === undefined) {
+  //     sampleColors = getInitialComponents();
+  //   } else {
+  //     sampleColors = sampleColorsFilter;
+  //   }
 
-    return sampleColors;
-  }
+  //   return sampleColors;
+  // }
 
 
   const DivSampleColors = ({...props}) => {
-    const currentColors = getSampleColors();
+    const currentColors = getSampleColors(components);
 
     const array: any = [];
     currentColors.map((component: Component) => {
@@ -823,13 +634,13 @@ function App() {
 
     const addSampleCount = (e: React.MouseEvent<HTMLElement>) => {
       // 新規追加時、色はサンプルと同じで、idを新規採番する
-      let newColor = {...getCurrentColor()};
+      let newColor = {...getCurrentColor(components)};
       const id = uuidv4();
       newColor.id = id;
 
       // const newComponents = components.map((component) => ({ ...component }));
 
-      addComponent(id, newColor, false, true)
+      addComponent(id, newColor, false, true);
 
       // 2個目に挿入
       // newComponents.push(newColor)
@@ -845,7 +656,7 @@ function App() {
     const removeSampleCount = (e: React.MouseEvent<HTMLElement>, id: string) => {
       // setCurrentColors(currentColors.filter((color) => color.id !== id));
 
-      removeComponent(id);
+      removeComponent(id, components, setComponents);
 
       
 
@@ -859,19 +670,19 @@ function App() {
 
     // styleを設定してdivタグに変換
     return <>
-      <Col className="col color-count-button" xs={3} md={1}>
+      <Col className="col color-count-button" xs={2} md={2}>
         {/* +, - ボタン */}
         {color.id === currentColorId 
           ? <Button variant="outline-secondary" className="color-count-button-plus" onClick={() => addSampleCount(props.e)}>+</Button> 
-          : <Button variant="outline-secondary" className="color-count-button-plus" disabled>　</Button>}
+          : <Button variant="outline-secondary" className="color-count-button-minus" onClick={() => removeSampleCount(props.e, color.id)}>-</Button>}
       {/* </Col>
       <Col className="col color-count-button" xs={1} md={1}> */}
-        {color.id !== currentColorId 
+        {/* {color.id !== currentColorId 
           ? <Button variant="outline-secondary" className="color-count-button-minus" onClick={() => removeSampleCount(props.e, color.id)}>-</Button> 
-          : <Button variant="outline-secondary" className="color-count-button-minus" disabled>　</Button>}
+          : <Button variant="outline-secondary" className="color-count-button-minus" disabled>　</Button>} */}
       </Col>
 
-      <Col className="col color-sample" xs={9} md={3}>
+      <Col className="col color-sample" xs={10} md={10}>
         <InputGroup.Text className='form-control sample-color' 
           id={id} 
           style={style} 
@@ -882,15 +693,18 @@ function App() {
         </InputGroup.Text>
       </Col>
 
-      <Col className="col color-value rgb align-self-end" xs={9} md={2}>
+      <Col className="col color-value rgb align-self-end" xs={2} md={2}></Col>
+      <Col className="col color-value rgb align-self-end" xs={10} md={10}>
         <Form.Control placeholder="rgb" aria-label="rgb" id={'copy-button-rgb'+id} value={getRGBCodeFromRGB(color)} readOnly />
         <CopyButton copyText={getRGBCodeFromRGB(color)} inputId={'copy-button-rgb'+id} />
       </Col>
-      <Col className="col color-value hex" xs={9} md={2}>
+      <Col className="col color-value rgb align-self-end" xs={2} md={2}></Col>
+      <Col className="col color-value hex" xs={10} md={10}>
         <Form.Control placeholder="hex" aria-label="hex" id={'copy-button-hex'+id} value={getHexCodeFromRGB(color)} readOnly />
         <CopyButton copyText={getHexCodeFromRGB(color)} inputId={'copy-button-hex'+id} />
       </Col>
-      <Col className="col color-value hsl" xs={9} md={2}>
+      <Col className="col color-value rgb align-self-end" xs={2} md={2}></Col>
+      <Col className="col color-value hsl" xs={10} md={10}>
         <Form.Control placeholder="hsl" aria-label="hsl" id={'copy-button-hsl'+id} value={getHSLCodeFromRGB(color)} readOnly />
         <CopyButton copyText={getHSLCodeFromRGB(color)} inputId={'copy-button-hsl'+id} />
       </Col>
@@ -901,153 +715,161 @@ function App() {
   
 
   
-  const DivColorBar = ({...props}) => {
-    const id = String(props.id);
+  // const DivColorSelector2 = ({...props}) => {
+  //   const id = String(props.id);
 
-    const className = 'color-bar-change';
+  //   const color = getCurrentColor(components);
 
-    let colorMin = {...getCurrentColor()};
-    let colorMax = {...getCurrentColor()};
-    let style;
+  //   const className = 'color-bar-change';
 
-    switch (id) {
+  //   // let colorMin = {...getCurrentColor(components)};
+  //   // let colorMax = {...getCurrentColor(components)};
+  //   let colorMin = { ...color };
+  //   let colorMax = { ...color };
+  //   let style;
 
-      // HSV
-      case "label-hsv-h":
-        let colorv1 = {...getCurrentColor()};
-        let colorv2 = {...getCurrentColor()};
-        let colorv3 = {...getCurrentColor()};
-        let colorv4 = {...getCurrentColor()};
-        colorv1['hsv_h'] = 0;
-        colorv2['hsv_h'] = 90;
-        colorv3['hsv_h'] = 180;
-        colorv4['hsv_h'] = 270;
-        colorv1 = HSV2RGB(colorv1);
-        colorv2 = HSV2RGB(colorv2);
-        colorv3 = HSV2RGB(colorv3);
-        colorv4 = HSV2RGB(colorv4);
-        style = { background: "linear-gradient(to right, " 
-          + getRGBCodeFromRGB(colorv1) + ", " 
-          + getRGBCodeFromRGB(colorv2) + ", " 
-          + getRGBCodeFromRGB(colorv3) + ", " 
-          + getRGBCodeFromRGB(colorv4) + ", " 
-          + getRGBCodeFromRGB(colorv1) + ")" };
-        break;
+  //   switch (id) {
 
-      case "label-hsv-s":
-        colorMin['hsv_s'] = 0;
-        colorMax['hsv_s'] = 1;
-        colorMin = HSV2RGB(colorMin);
-        colorMax = HSV2RGB(colorMax);
-        style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-        break;
+  //     // HSV
+  //     case "label-hsv-h":
+  //       // let colorv1 = {...getCurrentColor(components)};
+  //       // let colorv2 = {...getCurrentColor(components)};
+  //       // let colorv3 = {...getCurrentColor(components)};
+  //       // let colorv4 = {...getCurrentColor(components)};
+  //       let colorv1 = { ...color };
+  //       let colorv2 = { ...color };
+  //       let colorv3 = { ...color };
+  //       let colorv4 = { ...color };
+  //       colorv1['hsv_h'] = 0;
+  //       colorv2['hsv_h'] = 90;
+  //       colorv3['hsv_h'] = 180;
+  //       colorv4['hsv_h'] = 270;
+  //       colorv1 = HSV2RGB(colorv1);
+  //       colorv2 = HSV2RGB(colorv2);
+  //       colorv3 = HSV2RGB(colorv3);
+  //       colorv4 = HSV2RGB(colorv4);
+  //       style = { background: "linear-gradient(to right, " 
+  //         + getRGBCodeFromRGB(colorv1) + ", " 
+  //         + getRGBCodeFromRGB(colorv2) + ", " 
+  //         + getRGBCodeFromRGB(colorv3) + ", " 
+  //         + getRGBCodeFromRGB(colorv4) + ", " 
+  //         + getRGBCodeFromRGB(colorv1) + ")" };
+  //       break;
 
-      case "label-hsv-v":
-        colorMin['hsv_v'] = 0;
-        colorMax['hsv_v'] = 1;
-        colorMin = HSV2RGB(colorMin);
-        colorMax = HSV2RGB(colorMax);
-        style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-        break;
+  //     case "label-hsv-s":
+  //       colorMin['hsv_s'] = 0;
+  //       colorMax['hsv_s'] = 1;
+  //       colorMin = HSV2RGB(colorMin);
+  //       colorMax = HSV2RGB(colorMax);
+  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
+  //       break;
+
+  //     case "label-hsv-v":
+  //       colorMin['hsv_v'] = 0;
+  //       colorMax['hsv_v'] = 1;
+  //       colorMin = HSV2RGB(colorMin);
+  //       colorMax = HSV2RGB(colorMax);
+  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
+  //       break;
 
 
-      // HSL
-      case "label-hsl-h":
-        let colorl1 = {...getCurrentColor()};
-        let colorl2 = {...getCurrentColor()};
-        let colorl3 = {...getCurrentColor()};
-        let colorl4 = {...getCurrentColor()};
-        colorl1['hsl_h'] = 0;
-        colorl2['hsl_h'] = 90;
-        colorl3['hsl_h'] = 180;
-        colorl4['hsl_h'] = 270;
-        colorl1 = HSL2RGB(colorl1);
-        colorl2 = HSL2RGB(colorl2);
-        colorl3 = HSL2RGB(colorl3);
-        colorl4 = HSL2RGB(colorl4);
-        style = { background: "linear-gradient(to right, " 
-          + getRGBCodeFromRGB(colorl1) + ", " 
-          + getRGBCodeFromRGB(colorl2) + ", " 
-          + getRGBCodeFromRGB(colorl3) + ", " 
-          + getRGBCodeFromRGB(colorl4) + ", " 
-          + getRGBCodeFromRGB(colorl1) + ")" };
-        break;
+  //     // HSL
+  //     case "label-hsl-h":
+  //       let colorl1 = {...getCurrentColor(components)};
+  //       let colorl2 = {...getCurrentColor(components)};
+  //       let colorl3 = {...getCurrentColor(components)};
+  //       let colorl4 = {...getCurrentColor(components)};
+  //       colorl1['hsl_h'] = 0;
+  //       colorl2['hsl_h'] = 90;
+  //       colorl3['hsl_h'] = 180;
+  //       colorl4['hsl_h'] = 270;
+  //       colorl1 = HSL2RGB(colorl1);
+  //       colorl2 = HSL2RGB(colorl2);
+  //       colorl3 = HSL2RGB(colorl3);
+  //       colorl4 = HSL2RGB(colorl4);
+  //       style = { background: "linear-gradient(to right, " 
+  //         + getRGBCodeFromRGB(colorl1) + ", " 
+  //         + getRGBCodeFromRGB(colorl2) + ", " 
+  //         + getRGBCodeFromRGB(colorl3) + ", " 
+  //         + getRGBCodeFromRGB(colorl4) + ", " 
+  //         + getRGBCodeFromRGB(colorl1) + ")" };
+  //       break;
 
-      case "label-hsl-s":
-        colorMin['hsl_s'] = 0;
-        colorMax['hsl_s'] = 1;
-        colorMin = HSL2RGB(colorMin);
-        colorMax = HSL2RGB(colorMax);
-        style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-        break;
+  //     case "label-hsl-s":
+  //       colorMin['hsl_s'] = 0;
+  //       colorMax['hsl_s'] = 1;
+  //       colorMin = HSL2RGB(colorMin);
+  //       colorMax = HSL2RGB(colorMax);
+  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
+  //       break;
 
-      case "label-hsl-l":
-        colorMin['hsl_l'] = 0;
-        colorMax['hsl_l'] = 1;
-        colorMin = HSL2RGB(colorMin);
-        colorMax = HSL2RGB(colorMax);
-        style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-        break;
+  //     case "label-hsl-l":
+  //       colorMin['hsl_l'] = 0;
+  //       colorMax['hsl_l'] = 1;
+  //       colorMin = HSL2RGB(colorMin);
+  //       colorMax = HSL2RGB(colorMax);
+  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
+  //       break;
 
       
-      // CMYK
-      case "label-cmyk-c":
-        colorMin['cmyk_c'] = 0;
-        colorMax['cmyk_c'] = 1;
-        colorMin = CMYK2RGB(colorMin);
-        colorMax = CMYK2RGB(colorMax);
-        style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-        break;
+  //     // CMYK
+  //     case "label-cmyk-c":
+  //       colorMin['cmyk_c'] = 0;
+  //       colorMax['cmyk_c'] = 1;
+  //       colorMin = CMYK2RGB(colorMin);
+  //       colorMax = CMYK2RGB(colorMax);
+  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
+  //       break;
 
-      case "label-cmyk-m":
-        colorMin['cmyk_m'] = 0;
-        colorMax['cmyk_m'] = 1;
-        colorMin = CMYK2RGB(colorMin);
-        colorMax = CMYK2RGB(colorMax);
-        style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-        break;
+  //     case "label-cmyk-m":
+  //       colorMin['cmyk_m'] = 0;
+  //       colorMax['cmyk_m'] = 1;
+  //       colorMin = CMYK2RGB(colorMin);
+  //       colorMax = CMYK2RGB(colorMax);
+  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
+  //       break;
 
-      case "label-cmyk-y":
-        colorMin['cmyk_y'] = 0;
-        colorMax['cmyk_y'] = 1;
-        colorMin = CMYK2RGB(colorMin);
-        colorMax = CMYK2RGB(colorMax);
-        style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-        break;
+  //     case "label-cmyk-y":
+  //       colorMin['cmyk_y'] = 0;
+  //       colorMax['cmyk_y'] = 1;
+  //       colorMin = CMYK2RGB(colorMin);
+  //       colorMax = CMYK2RGB(colorMax);
+  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
+  //       break;
       
-      case "label-cmyk-k":
-        colorMin['cmyk_k'] = 0;
-        colorMax['cmyk_k'] = 1;
-        colorMin = CMYK2RGB(colorMin);
-        colorMax = CMYK2RGB(colorMax);
-        style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-        break;
+  //     case "label-cmyk-k":
+  //       colorMin['cmyk_k'] = 0;
+  //       colorMax['cmyk_k'] = 1;
+  //       colorMin = CMYK2RGB(colorMin);
+  //       colorMax = CMYK2RGB(colorMax);
+  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
+  //       break;
 
-      default:
-        break;
-    }
+  //     default:
+  //       break;
+  //   }
 
-    // styleを設定してdivタグに変換
-    return <div 
-      style={style} 
-      className={className} 
-      >
-        { props.children }
-      </div>
-  };
+  //   // styleを設定してdivタグに変換
+  //   return <div 
+  //     style={style} 
+  //     className={className} 
+  //     >
+  //       { props.children }
+  //     </div>
+  // };
 
 
 
   // 表示・非表示機能
-  const [showColorBar, setShowColorBar] = useState<boolean>(true);
+  const [showColorSelector, setShowColorSelector] = useState<boolean>(true);
   const [showSampleColor, setShowSampleColor] = useState<boolean>(true);
 
-  const handleToggleColorBar = () => {
-    setShowColorBar(!showColorBar);
+  const handleToggleColorSelector = () => {
+    setShowColorSelector(!showColorSelector);
   }
 
-  const getShowAllColorBar = () => {
-    return showColorBar ? '' : {style: {display: 'none' }}
+  const getShowAllColorSelector = () => {
+    return showColorSelector ? '' : {style: {display: 'none' }}
   }
 
   const handleToggleSampleColor = () => {
@@ -1065,101 +887,101 @@ function App() {
   const [showColorHSL, setShowColorHSL] = useState<boolean>(true);
   const [showColorCMYK, setShowColorCMYK] = useState<boolean>(true);
 
-  const handleToggleColorButton = (buttonName: string) => {
-    switch (buttonName) {
-      case 'button_rgb':
-        setShowColorRGB(!showColorRGB);
-        break;
-      case 'button_hsv':
-        setShowColorHSV(!showColorHSV);
-        break;
-      case 'button_hsl':
-        setShowColorHSL(!showColorHSL);
-        break;
-      case 'button_cmyk':
-        setShowColorCMYK(!showColorCMYK);
-        break;
-      default:
-        break;
-    }
+  // const handleToggleColorButton = (buttonName: string) => {
+  //   switch (buttonName) {
+  //     case 'button_rgb':
+  //       setShowColorRGB(!showColorRGB);
+  //       break;
+  //     case 'button_hsv':
+  //       setShowColorHSV(!showColorHSV);
+  //       break;
+  //     case 'button_hsl':
+  //       setShowColorHSL(!showColorHSL);
+  //       break;
+  //     case 'button_cmyk':
+  //       setShowColorCMYK(!showColorCMYK);
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // }
 
-  }
-  const getColorButtonStyle = (buttonName: string) => {
-    switch (buttonName) {
-      case 'button_rgb':
-        return showColorRGB ? {active: true} : {active: false};
-        break;
-      case 'button_hsv':
-        return showColorHSV ? {active: true} : {active: false};
-        break;
-      case 'button_hsl':
-        return showColorHSL ? {active: true} : {active: false};
-        break;
-      case 'button_cmyk':
-        return showColorCMYK ? {active: true} : {active: false};
-        break;
-      default:
-        return {};
-        break;
-    }
-    // return showColorBar ? '' : {style: {display: 'none' }}
-  }
+  // const getColorButtonStyle = (buttonName: string) => {
+  //   switch (buttonName) {
+  //     case 'button_rgb':
+  //       return showColorRGB ? {active: true} : {active: false};
+  //       break;
+  //     case 'button_hsv':
+  //       return showColorHSV ? {active: true} : {active: false};
+  //       break;
+  //     case 'button_hsl':
+  //       return showColorHSL ? {active: true} : {active: false};
+  //       break;
+  //     case 'button_cmyk':
+  //       return showColorCMYK ? {active: true} : {active: false};
+  //       break;
+  //     default:
+  //       return {};
+  //       break;
+  //   }
+  //   // return showColorSelector ? '' : {style: {display: 'none' }}
+  // }
 
-  const getShowColorBar = (colorBarName: string) => {
-    let obj;
+  // const getShowColorSelector = (ColorSelectorName: string) => {
+  //   let obj;
 
 
-    switch (colorBarName) {
-      case 'rgb':
-        if (showColorRGB && showColorHSV && showColorHSL) {
-          // 全表示
-          return {xxl: 12, className: 'border-bottom'} 
-        } else if (showColorRGB && !showColorHSV && !showColorHSL && !showColorCMYK) {
-          // RGBのみ表示
-          return {xxl: 12, } 
-        } else if (showColorRGB) {
-          // RGBは表示状態
-          return {xxl: 6, }
-        } else {
-          return {xxl: 6, style: {display: 'none' }}
-        }
-        break;
+  //   switch (ColorSelectorName) {
+  //     case 'rgb':
+  //       if (showColorRGB && showColorHSV && showColorHSL) {
+  //         // 全表示
+  //         return {xxl: 12, className: 'border-bottom'} 
+  //       } else if (showColorRGB && !showColorHSV && !showColorHSL && !showColorCMYK) {
+  //         // RGBのみ表示
+  //         return {xxl: 12, } 
+  //       } else if (showColorRGB) {
+  //         // RGBは表示状態
+  //         return {xxl: 6, }
+  //       } else {
+  //         return {xxl: 6, style: {display: 'none' }}
+  //       }
+  //       break;
 
-      case 'hsv':
-        if (!showColorRGB && showColorHSV && !showColorHSL && !showColorCMYK) {
-          return {xxl: 12, } 
-        } else if (showColorHSV) {
-          return {xxl: 6, }
-        } else {
-          return {xxl: 6, style: {display: 'none' }}
-        }
-        break;
+  //     case 'hsv':
+  //       if (!showColorRGB && showColorHSV && !showColorHSL && !showColorCMYK) {
+  //         return {xxl: 12, } 
+  //       } else if (showColorHSV) {
+  //         return {xxl: 6, }
+  //       } else {
+  //         return {xxl: 6, style: {display: 'none' }}
+  //       }
+  //       break;
 
-      case 'hsl':
-        if (!showColorRGB && !showColorHSV && showColorHSL && !showColorCMYK) {
-          return {xxl: 12, } 
-        } else if (showColorHSL) {
-          return {xxl: 6, }
-        } else {
-          return {xxl: 6, style: {display: 'none' }}
-        }
-        break;
+  //     case 'hsl':
+  //       if (!showColorRGB && !showColorHSV && showColorHSL && !showColorCMYK) {
+  //         return {xxl: 12, } 
+  //       } else if (showColorHSL) {
+  //         return {xxl: 6, }
+  //       } else {
+  //         return {xxl: 6, style: {display: 'none' }}
+  //       }
+  //       break;
 
-      case 'cmyk':
-        if (!showColorRGB && !showColorHSV && !showColorHSL && showColorCMYK) {
-          return {xxl: 12, } 
-        } else if (showColorCMYK) {
-          return {xxl: 6, }
-        } else {
-          return {xxl: 6, style: {display: 'none' }}
-        }
-        break;
+  //     case 'cmyk':
+  //       if (!showColorRGB && !showColorHSV && !showColorHSL && showColorCMYK) {
+  //         return {xxl: 12, } 
+  //       } else if (showColorCMYK) {
+  //         return {xxl: 6, }
+  //       } else {
+  //         return {xxl: 6, style: {display: 'none' }}
+  //       }
+  //       break;
 
-      default:
-        return {};
-        break;
-    }
-  }
+  //     default:
+  //       return {};
+  //       break;
+  //   }
+  // }
 
 
   return (
@@ -1167,7 +989,7 @@ function App() {
     <div className="App" ref={appRef}>
 
 
-      <BrowserRouter>
+      {/* <BrowserRouter> */}
 
         {/* ヘッダー */}
         <Navbar bg="dark" variant="dark" expand="lg" fixed="top" id="header2" ref={headerRef}>
@@ -1213,398 +1035,287 @@ function App() {
         <DivColor id='body-background'></DivColor>
 
 
-
+        {/* Body */}
         <Container className='mt-5 pt-5 body-main' ref={bodyRef}>
           <Row>
-          <Col xs={12} md={9}>
+            {/* Col */}
+            <Col xs={12} md={9}>
 
-          {/* 設定ボタン */}
-          <Row>
-            
-          </Row>
-
-
-
-          {/* カラーバー */}
-          <ButtonToolbar aria-label="Toolbar with button groups" className='mt-2'>
-            <ButtonGroup className="me-2" aria-label="First group">
-              <Button variant="outline-secondary" size="sm" onClick={() => {handleToggleColorBar()}}>{showColorBar ? "hide" : "show"}</Button>
-            </ButtonGroup>
-            <ButtonGroup className="me-2" aria-label="Second group"　{...getShowAllColorBar()}>
-              <Button variant="outline-primary" size="sm" onClick={() => {handleToggleColorButton('button_rgb')}} {...getColorButtonStyle('button_rgb')}>RGB</Button>
-              <Button variant="outline-primary" size="sm" onClick={() => {handleToggleColorButton('button_hsv')}} {...getColorButtonStyle('button_hsv')}>HSV</Button>
-              <Button variant="outline-primary" size="sm" onClick={() => {handleToggleColorButton('button_hsl')}} {...getColorButtonStyle('button_hsl')}>HSL</Button>
-              <Button variant="outline-primary" size="sm" onClick={() => {handleToggleColorButton('button_cmyk')}} {...getColorButtonStyle('button_cmyk')}>CMYK</Button>
-            </ButtonGroup>
-          </ButtonToolbar>
-
-          <Container className='border mt-3 color-bars' fluid="md">
-
-            {/* <Button variant="outline-secondary" size="sm" onClick={() => {handleToggleColorBar()}}>{showColorBar ? "隠す" : "表示"}</Button> */}
-            <Row {...getShowAllColorBar()}>
-
-              {/* 色変更バー */}
-              {/* RGB */}
-              <Col {...getShowColorBar('rgb')}>
-                <Row className="my-2" id="rgb">
-
-                  <Row className='my-2'>
-                    <Col xs='auto'>
-                      <FontAwesomeIcon icon={faPalette} />
-                      <span className='color-space-name'>RGB</span>
-                    </Col>
-                  </Row>
-
-                  <Row className='my-2'>
-                    {/* <Col xs={3} md={2}>
-                      <form>
-                        <label className="form-label">
-                          R
-                          <input type="text" className="form-control" id="r-text" onChange={() => {}} value={Math.trunc(getCurrentColor().r)} />
-                        </label>
-                      </form>
-                    </Col>
-                    <Col xs={9} md={10} className='col-color-range'>
-                      <Row className='color-range'>
-                        <div className='label r'>　</div>
-                        <input type="range" className="form-range" id="r" min="0" max="255" step="1" value={getCurrentColor().r} onChange={(e) => handleChangeRange(e, 'r')}></input>
-                      </Row>
-                    </Col> */}
-
-                    <ColorBars 
-                      text='R'
-                      textId='r-text'
-                      label='label r'
-                      id='r'
-                      currentColorValue={getCurrentColor().r}
-                      handleChangeRange={(e) => handleChangeRange(e, 'r')}
-                     />
-
-                     
-                  </Row>
-
-                  <Row className='my-2'>
-                    {/* <Col xs={3} md={2}>
-                      <form>
-                        <label className="form-label">
-                          G
-                          <input type="text" className="form-control" id="g-text" onChange={() => {}} value={Math.trunc(getCurrentColor().g)} />
-                        </label>
-                      </form>
-                    </Col>
-                    <Col xs={9} md={10} className='col-color-range'>
-                      <Row className='color-range'>
-                        <div className='label g'>　</div>
-                        <input type="range" className="form-range" id="g" min="0" max="255" step="1" value={getCurrentColor().g} onChange={(e) => handleChangeRange(e, 'g')}></input>
-                      </Row>
-                    </Col> */}
-
-                    <ColorBars 
-                      text='G'
-                      textId='g-text'
-                      label='label g'
-                      id='g'
-                      currentColorValue={getCurrentColor().g}
-                      handleChangeRange={(e) => handleChangeRange(e, 'g')}
-                     />
-
-                  </Row>
-
-                  <Row className='my-2'>
-                    <Col xs={3} md={2}>
-                      <form>
-                        <label className="form-label">
-                          B
-                          <input type="text" className="form-control" id="b-text" onChange={() => {}} value={Math.trunc(getCurrentColor().b)} />
-                        </label>
-                      </form>
-                    </Col>
-                    <Col xs={9} md={10} className='col-color-range'>
-                      <Row className='color-range'>
-                        <div className='label b'>　</div>
-                        <input type="range" className="form-range" id="b" min="0" max="255" step="1" value={getCurrentColor().b} onChange={(e) => handleChangeRange(e, 'b')}></input>
-                      </Row>
-                    </Col>
-                  </Row>
-                </Row>
-              </Col>
-
-              {/* <ColRGB /> */}
-
-              {/* HSV */}
-              <Col {...getShowColorBar('hsv')}>
-                <Row className="my-2" id="hsv">
-
-                  <Row className='my-2'>
-                    <Col xs='auto'>
-                      <FontAwesomeIcon icon={faPalette} />
-                      <span className='color-space-name'>HSV</span>
-                    </Col>
-                  </Row>
-
-                  <Row className='my-2'>
-                    <Col xs={3} md={2}>
-                      <form>
-                        <label className="form-label">
-                          色相(H)
-                          <input type="text" className="form-control" id="hsv-h-text" onChange={() => {}} value={Math.trunc(getCurrentColor().hsv_h)} />
-                        </label>
-                      </form>
-                    </Col>
-                    <Col xs={9} md={10} className='col-color-range'>
-                      <Row className='color-range'>
-                        <DivColorBar className='label hsv-h' id="label-hsv-h">　</DivColorBar>
-                        <input type="range" className="form-range" id="hsv-h" min="0" max="359" step="0.0001" value={getCurrentColor().hsv_h} onChange={(e) => handleChangeRange(e, 'hsv_h')}></input>
-                      </Row>
-                    </Col>
-                  </Row>
-
-                  <Row className='my-2'>
-                    <Col xs={3} md={2}>
-                      <form>
-                        <label className="form-label">
-                          彩度(S)
-                          <input type="text" className="form-control" id="hsv-s-text" onChange={() => {}} value={Math.trunc(getCurrentColor().hsv_s * 1000) / 1000} />
-                        </label>
-                      </form>
-                    </Col>
-                    <Col xs={9} md={10} className='col-color-range'>
-                      <Row className='color-range'>
-                        <DivColorBar className='label hsv-s' id="label-hsv-s">　</DivColorBar>
-                        <input type="range" className="form-range" id="hsv-s" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().hsv_s} onChange={(e) => handleChangeRange(e, 'hsv_s')}></input>
-                      </Row>
-                    </Col>
-                  </Row>
-
-                  <Row className='my-2'>
-                    <Col xs={3} md={2}>
-                      <form>
-                        <label className="form-label">
-                          明度(V)
-                          <input type="text" className="form-control" id="hsv-v-text" onChange={() => {}} value={Math.trunc(getCurrentColor().hsv_v * 1000) / 1000} />
-                        </label>
-                      </form>
-                    </Col>
-                    <Col xs={9} md={10} className='col-color-range'>
-                      <Row className='color-range'>
-                        <DivColorBar className='label hsv-v' id="label-hsv-v">　</DivColorBar>
-                        <input type="range" className="form-range" id="hsv-v" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().hsv_v} onChange={(e) => handleChangeRange(e, 'hsv_v')}></input>
-                      </Row>
-                    </Col>
-                  </Row>
-
-                </Row>
-              </Col>
-
-              {/* HSL */}
-              <Col {...getShowColorBar('hsl')}>
-                <Row className="my-2" id="hsl">
-
-                  <Row className='my-2'>
-                    <Col xs='auto'>
-                      <FontAwesomeIcon icon={faPalette} />
-                      <span className='color-space-name'>HSL</span>
-                    </Col>
-                  </Row>
-
-                  <Row className='my-2'>
-                    <Col xs={3} md={2}>
-                      <form>
-                        <label className="form-label">
-                          色相(H)
-                          <input type="text" className="form-control" id="hsl-h-text" onChange={() => {}} value={Math.trunc(getCurrentColor().hsl_h)} />
-                        </label>
-                      </form>
-                    </Col>
-                    <Col xs={9} md={10} className='col-color-range'>
-                      <Row className='color-range'>
-                        <DivColorBar className='label hsl-h' id="label-hsl-h">　</DivColorBar>
-                        <input type="range" className="form-range" id="hsl-h" min="0" max="359" step="0.0001" value={getCurrentColor().hsl_h} onChange={(e) => handleChangeRange(e, 'hsl_h')}></input>
-                      </Row>
-                    </Col>
-
-                  </Row>
-                  
-                  <Row className='my-2'>
-                   <Col xs={3} md={2}>
-                      <form>
-                        <label className="form-label">
-                          彩度(S)
-                          <input type="text" className="form-control" id="hsl-s-text" onChange={() => {}} value={Math.trunc(getCurrentColor().hsl_s * 1000) / 1000} />
-                        </label>
-                      </form>
-                    </Col>
-                    <Col xs={9} md={10} className='col-color-range'>
-                      <Row className='color-range'>
-                        <DivColorBar className='label hsl-s' id="label-hsl-s">　</DivColorBar>
-                        <input type="range" className="form-range" id="hsl-s" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().hsl_s} onChange={(e) => handleChangeRange(e, 'hsl_s')}></input>
-                      </Row>
-                    </Col>
-                  </Row>
-
-                  <Row className='my-2'>
-                    <Col xs={3} md={2}>
-                      <form>
-                        <label className="form-label">
-                          輝度(L)
-                          <input type="text" className="form-control" id="hsl-l-text" onChange={() => {}} value={Math.trunc(getCurrentColor().hsl_l * 1000) / 1000} />
-                        </label>
-                      </form>
-                    </Col>
-                    <Col xs={9} md={10} className='col-color-range'>
-                      <Row className='color-range'>
-                        <DivColorBar className='label hsl-l' id="label-hsl-l">　</DivColorBar>
-                        <input type="range" className="form-range" id="hsl-l" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().hsl_l} onChange={(e) => handleChangeRange(e, 'hsl_l')}></input>
-                      </Row>
-                    </Col>
-                  </Row>
-                </Row>
-              </Col>
-
-              {/* CMYK */}
-              <Col {...getShowColorBar('cmyk')}>
-                <Row className="my-2" id="cmyk">
-
-                  <Row className='my-2'>
-                    <Col xs='auto'>
-                      <FontAwesomeIcon icon={faPalette} />
-                      <span className='color-space-name'>CMYK</span>
-                    </Col>
-                  </Row>
-
-                  <Row className='my-2'>
-                    <Col xs={3} md={2}>
-                      <form>
-                        <label className="form-label">
-                          Cyan
-                          <input type="text" className="form-control" id="cmyk-c-text" onChange={() => {}} value={Math.trunc(getCurrentColor().cmyk_c * 100)} />
-                        </label>
-                      </form>
-                    </Col>
-                    <Col xs={9} md={10} className='col-color-range'>
-                      <Row className='color-range'>
-                        <DivColorBar className='label cmyk-c' id="label-cmyk-c">　</DivColorBar>
-                        <input type="range" className="form-range" id="cmyk-c" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().cmyk_c} onChange={(e) => handleChangeRange(e, 'cmyk_c')}></input>
-                      </Row>
-                    </Col>
-
-                  </Row>
-                  
-                  <Row className='my-2'>
-                   <Col xs={3} md={2}>
-                      <form>
-                        <label className="form-label">
-                          Magenta
-                          <input type="text" className="form-control" id="cmyk-m-text" onChange={() => {}} value={Math.trunc(getCurrentColor().cmyk_m * 100)} />
-                        </label>
-                      </form>
-                    </Col>
-                    <Col xs={9} md={10} className='col-color-range'>
-                      <Row className='color-range'>
-                        <DivColorBar className='label cmyk-m' id="label-cmyk-m">　</DivColorBar>
-                        <input type="range" className="form-range" id="cmyk-m" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().cmyk_m} onChange={(e) => handleChangeRange(e, 'cmyk_m')}></input>
-                      </Row>
-                    </Col>
-                  </Row>
-
-                  <Row className='my-2'>
-                   <Col xs={3} md={2}>
-                      <form>
-                        <label className="form-label">
-                          Yellow
-                          <input type="text" className="form-control" id="cmyk-y-text" onChange={() => {}} value={Math.trunc(getCurrentColor().cmyk_y * 100)} />
-                        </label>
-                      </form>
-                    </Col>
-                    <Col xs={9} md={10} className='col-color-range'>
-                      <Row className='color-range'>
-                        <DivColorBar className='label cmyk-y' id="label-cmyk-y">　</DivColorBar>
-                        <input type="range" className="form-range" id="cmyk-y" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().cmyk_y} onChange={(e) => handleChangeRange(e, 'cmyk_y')}></input>
-                      </Row>
-                    </Col>
-                  </Row>
-
-                  <Row className='my-2'>
-                   <Col xs={3} md={2}>
-                      <form>
-                        <label className="form-label">
-                          Key plate
-                          <input type="text" className="form-control" id="cmyk-k-text" onChange={() => {}} value={Math.trunc(getCurrentColor().cmyk_k * 100)} />
-                        </label>
-                      </form>
-                    </Col>
-                    <Col xs={9} md={10} className='col-color-range'>
-                      <Row className='color-range'>
-                        <DivColorBar className='label cmyk-k' id="label-cmyk-k">　</DivColorBar>
-                        <input type="range" className="form-range" id="cmyk-k" min="0.0001" max="1.001" step="0.001" value={getCurrentColor().cmyk_k} onChange={(e) => handleChangeRange(e, 'cmyk_k')}></input>
-                      </Row>
-                    </Col>
-                  </Row>
-
-
-                </Row>
-              </Col>
-
+            {/* 設定ボタン */}
+            <Row>
+              
             </Row>
-          </Container>
 
 
-          {/* サンプルカラー */}
-          <ButtonToolbar aria-label="Toolbar with button groups" className='mt-4'>
-            <ButtonGroup className="me-2" aria-label="First group">
-              <Button variant="outline-secondary" size="sm" onClick={() => {handleToggleSampleColor()}}>{showSampleColor ? "hide" : "show"}</Button>
-            </ButtonGroup>
-          </ButtonToolbar>
 
-          <Container className='border mt-3'>
-            <Row {...getShowSampleColor()}>
-              {/* <DivSampleColor /> */}
-              <DivSampleColors />
-            </Row>
-          </Container>
+            {/* カラーバー */}
+            <ButtonToolbar aria-label="Toolbar with button groups" className='mt-2'>
+              <ButtonGroup className="me-2" aria-label="First group">
+                <Button variant="outline-secondary" size="sm" onClick={() => {handleToggleColorSelector()}}>{showColorSelector ? "hide" : "show"}</Button>
+              </ButtonGroup>
+              <ButtonGroup className="me-2" aria-label="Second group"　{...getShowAllColorSelector()}>
+                <Button variant="outline-primary" size="sm" onClick={() => {handleToggleColorButton('button_rgb', showColorRGB, showColorHSV, showColorHSL, showColorCMYK, setShowColorRGB, setShowColorHSV, setShowColorHSL, setShowColorCMYK)}} {...getColorButtonStyle('button_rgb', showColorRGB, showColorHSV, showColorHSL, showColorCMYK)}>RGB</Button>
+                <Button variant="outline-primary" size="sm" onClick={() => {handleToggleColorButton('button_hsv', showColorRGB, showColorHSV, showColorHSL, showColorCMYK, setShowColorRGB, setShowColorHSV, setShowColorHSL, setShowColorCMYK)}} {...getColorButtonStyle('button_hsv', showColorRGB, showColorHSV, showColorHSL, showColorCMYK)}>HSV</Button>
+                <Button variant="outline-primary" size="sm" onClick={() => {handleToggleColorButton('button_hsl', showColorRGB, showColorHSV, showColorHSL, showColorCMYK, setShowColorRGB, setShowColorHSV, setShowColorHSL, setShowColorCMYK)}} {...getColorButtonStyle('button_hsl', showColorRGB, showColorHSV, showColorHSL, showColorCMYK)}>HSL</Button>
+                <Button variant="outline-primary" size="sm" onClick={() => {handleToggleColorButton('button_cmyk', showColorRGB, showColorHSV, showColorHSL, showColorCMYK, setShowColorRGB, setShowColorHSV, setShowColorHSL, setShowColorCMYK)}} {...getColorButtonStyle('button_cmyk', showColorRGB, showColorHSV, showColorHSL, showColorCMYK)}>CMYK</Button>
+              </ButtonGroup>
+            </ButtonToolbar>
 
-          {/* onClick={(e) => handleClick(id, true)} 
+            <Container className='border mt-3 color-bars' fluid="md">
 
-  onDragStart={(e) => handleDrag(id, true)} 
+              {/* <Button variant="outline-secondary" size="sm" onClick={() => {handleToggleColorSelector()}}>{showColorSelector ? "隠す" : "表示"}</Button> */}
+              <Row {...getShowAllColorSelector()}>
+
+                {/* 色変更バー */}
+                {/* RGB */}
+                <Col {...getShowColorSelector('rgb', showColorRGB, showColorHSV, showColorHSL, showColorCMYK)}>
+                  <Row className="my-2" id="rgb">
+
+                    <Row className='my-2'>
+                      <Col xs='auto'>
+                        <FontAwesomeIcon icon={faPalette} />
+                        <span className='color-space-name'>RGB</span>
+                      </Col>
+                    </Row>
+
+                      <ColorSelectors 
+                        text='R'
+                        id='rgb-r'
+                        color={getCurrentColor(components)}
+                        colorValue={Math.trunc(getCurrentColor(components).r)}
+                        colorRange={getCurrentColor(components).r}
+                        handleChangeRange={(e) => handleChangeRange(e, 'r')}
+                        min={0}
+                        max={255}
+                        step={1}
+                      />
+
+                      <ColorSelectors 
+                        text='G'
+                        id='rgb-g'
+                        color={getCurrentColor(components)}
+                        colorValue={Math.trunc(getCurrentColor(components).g)}
+                        colorRange={getCurrentColor(components).g}
+                        handleChangeRange={(e) => handleChangeRange(e, 'g')}
+                        min={0}
+                        max={255}
+                        step={1}
+                      />
+
+                    <ColorSelectors 
+                        text='B'
+                        id='rgb-b'
+                        color={getCurrentColor(components)}
+                        colorValue={Math.trunc(getCurrentColor(components).b)}
+                        colorRange={getCurrentColor(components).b}
+                        handleChangeRange={(e) => handleChangeRange(e, 'b')}
+                        min={0}
+                        max={255}
+                        step={1}
+                    />
+
+                  </Row>
+                </Col>
+
+                {/* HSV */}
+                <Col {...getShowColorSelector('hsv', showColorRGB, showColorHSV, showColorHSL, showColorCMYK)}>
+                  <Row className="my-2" id="hsv">
+
+                    <Row className='my-2'>
+                      <Col xs='auto'>
+                        <FontAwesomeIcon icon={faPalette} />
+                        <span className='color-space-name'>HSV</span>
+                      </Col>
+                    </Row>
+
+                      <ColorSelectors 
+                        text='色相(H)'
+                        id='hsv-h'
+                        color={getCurrentColor(components)}
+                        colorValue={Math.trunc(getCurrentColor(components).hsv_h)}
+                        colorRange={getCurrentColor(components).hsv_h}
+                        handleChangeRange={(e) => handleChangeRange(e, 'hsv_h')}
+                        min={0}
+                        max={359}
+                        step={0.0001}
+                      />
+
+                      <ColorSelectors 
+                        text='彩度(S)'
+                        id='hsv-s'
+                        color={getCurrentColor(components)}
+                        colorValue={Math.trunc(getCurrentColor(components).hsv_s * 1000) / 1000}
+                        colorRange={getCurrentColor(components).hsv_s}
+                        handleChangeRange={(e) => handleChangeRange(e, 'hsv_s')}
+                        min={0.0001}
+                        max={1.001}
+                        step={0.001}
+                      />
+
+                      <ColorSelectors 
+                        text='明度(V)'
+                        id='hsv-v'
+                        color={getCurrentColor(components)}
+                        colorValue={Math.trunc(getCurrentColor(components).hsv_v * 1000) / 1000}
+                        colorRange={getCurrentColor(components).hsv_v}
+                        handleChangeRange={(e) => handleChangeRange(e, 'hsv_v')}
+                        min={0.0001}
+                        max={1.001}
+                        step={0.001}
+                      />
+
+                  </Row>
+                </Col>
+
+                {/* HSL */}
+                <Col {...getShowColorSelector('hsl', showColorRGB, showColorHSV, showColorHSL, showColorCMYK)}>
+                  <Row className="my-2" id="hsl">
+
+                    <Row className='my-2'>
+                      <Col xs='auto'>
+                        <FontAwesomeIcon icon={faPalette} />
+                        <span className='color-space-name'>HSL</span>
+                      </Col>
+                    </Row>
+
+                    <ColorSelectors 
+                        text='色相(H)'
+                        id='hsl-h'
+                        color={getCurrentColor(components)}
+                        colorValue={Math.trunc(getCurrentColor(components).hsl_h)}
+                        colorRange={getCurrentColor(components).hsl_h}
+                        handleChangeRange={(e) => handleChangeRange(e, 'hsl_h')}
+                        min={0}
+                        max={359}
+                        step={0.0001}
+                      />
+
+                    <ColorSelectors 
+                        text='彩度(S)'
+                        id='hsl-s'
+                        color={getCurrentColor(components)}
+                        colorValue={Math.trunc(getCurrentColor(components).hsl_s * 1000) / 1000}
+                        colorRange={getCurrentColor(components).hsl_s}
+                        handleChangeRange={(e) => handleChangeRange(e, 'hsl_s')}
+                        min={0.0001}
+                        max={1.001}
+                        step={0.001}
+                      />
+
+                    <ColorSelectors 
+                        text='輝度(L)'
+                        id='hsl-l'
+                        color={getCurrentColor(components)}
+                        colorValue={Math.trunc(getCurrentColor(components).hsl_l * 1000) / 1000}
+                        colorRange={getCurrentColor(components).hsl_l}
+                        handleChangeRange={(e) => handleChangeRange(e, 'hsl_l')}
+                        min={0.0001}
+                        max={1.001}
+                        step={0.001}
+                      />
+                  </Row>
+                </Col>
+
+                {/* CMYK */}
+                <Col {...getShowColorSelector('cmyk', showColorRGB, showColorHSV, showColorHSL, showColorCMYK)}>
+                  <Row className="my-2" id="cmyk">
+
+                    <Row className='my-2'>
+                      <Col xs='auto'>
+                        <FontAwesomeIcon icon={faPalette} />
+                        <span className='color-space-name'>CMYK</span>
+                      </Col>
+                    </Row>
+
+                    <ColorSelectors 
+                        text='Cyan'
+                        id='cmyk-c'
+                        color={getCurrentColor(components)}
+                        colorValue={Math.trunc(getCurrentColor(components).cmyk_c * 100)}
+                        colorRange={getCurrentColor(components).cmyk_c}
+                        handleChangeRange={(e) => handleChangeRange(e, 'cmyk_c')}
+                        min={0.0001}
+                        max={1.001}
+                        step={0.001}
+                      />
+
+                    <ColorSelectors 
+                        text='Magenta'
+                        id='cmyk-m'
+                        color={getCurrentColor(components)}
+                        colorValue={Math.trunc(getCurrentColor(components).cmyk_m * 100)}
+                        colorRange={getCurrentColor(components).cmyk_m}
+                        handleChangeRange={(e) => handleChangeRange(e, 'cmyk_m')}
+                        min={0.0001}
+                        max={1.001}
+                        step={0.001}
+                      />
+
+                    <ColorSelectors 
+                        text='Yellow'
+                        id='cmyk-y'
+                        color={getCurrentColor(components)}
+                        colorValue={Math.trunc(getCurrentColor(components).cmyk_y * 100)}
+                        colorRange={getCurrentColor(components).cmyk_y}
+                        handleChangeRange={(e) => handleChangeRange(e, 'cmyk_y')}
+                        min={0.0001}
+                        max={1.001}
+                        step={0.001}
+                      />
+
+                    <ColorSelectors 
+                        text='Key plate'
+                        id='cmyk-k'
+                        color={getCurrentColor(components)}
+                        colorValue={Math.trunc(getCurrentColor(components).cmyk_k * 100)}
+                        colorRange={getCurrentColor(components).cmyk_k}
+                        handleChangeRange={(e) => handleChangeRange(e, 'cmyk_k')}
+                        min={0.0001}
+                        max={1.001}
+                        step={0.001}
+                      />
 
 
-  onDrop={(e) => handleDrop(id, false)} 
-  onDragOver={(e) => handleDragOver(id, true)}  */}
-        
-          {/* test */}
-            {/* <Row className="mt-5" id="body" >
-              <Row className='m-2'>
-                <DivColor id="body1" className="my-5 py-3">
-                  aaa
-                </DivColor>
+                  </Row>
+                </Col>
+
               </Row>
-              <Row className='m-2'>
-                <DivColor id="body2">
-                  bbb
-                </DivColor>
-              </Row>
-              <Row className='m-2'>
-                <DivColor id="body3">
-                  ccc
-                </DivColor>
-              </Row>
-            </Row> */}
+            </Container>
 
-          </Col>
 
-          <Col xs={12} md={3}>
 
-          {/* カードPattern */}
-          <Row className="mt-5" id="card" >
-            <Col sm={12}>
-              <Button variant="outline-secondary" size="sm" className='button-card' onClick={removeCard}>-</Button>
-              <span className='mx-2'>Pattern</span>
-              <Button variant="outline-secondary" size="sm" className='button-card' onClick={addCard}>+</Button>
+
             </Col>
-            <DivCard />
-          </Row>
 
-          </Col>
+            {/* Col */}
+            <Col xs={12} md={3}>
+
+              
+              {/* サンプルカラー */}
+              <ButtonToolbar aria-label="Toolbar with button groups" className='mt-4'>
+                <ButtonGroup className="me-2" aria-label="First group">
+                  <Button variant="outline-secondary" size="sm" onClick={() => {handleToggleSampleColor()}}>{showSampleColor ? "hide" : "show"}</Button>
+                </ButtonGroup>
+              </ButtonToolbar>
+
+              <Container className='border mt-3'>
+                <Row {...getShowSampleColor()}>
+                  {/* <DivSampleColor /> */}
+                  <DivSampleColors />
+                </Row>
+              </Container>
+
+              {/* Pattern */}
+              <Row className="mt-5" id="card" >
+                <Col sm={12}>
+                  <Button variant="outline-secondary" size="sm" className='button-card' onClick={() => removeCard(cardCount, setCardCount)}>-</Button>
+                  <span className='mx-2'>Pattern</span>
+                  <Button variant="outline-secondary" size="sm" className='button-card' onClick={() => addCard(cardCount, setCardCount)}>+</Button>
+                </Col>
+                <DivCard />
+              </Row>
+
+            </Col>
           </Row>
         </Container>
 
@@ -1635,7 +1346,7 @@ function App() {
         
 
 
-      </BrowserRouter>
+      {/* </BrowserRouter> */}
 
     </div>
   );

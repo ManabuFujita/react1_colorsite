@@ -1,6 +1,9 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
+@import "~tailwindcss/base";
+@import "~tailwindcss/components";
+@import "~tailwindcss/utilities";
 
 :root {
   /* --foreground-rgb: 0, 0, 0;
@@ -26,11 +29,11 @@ body {
     rgb(var(--background-start-rgb));
 }
 
-@layer utilities {
+/* @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
-}
+} */
 
 
 
@@ -124,7 +127,7 @@ form {
     content: "";
     /* display: inline-block; */
 
-    &.r {
+    /* &.r {
       background: linear-gradient(to right, rgb(255, 255, 255), rgb(255, 0, 0));
     }
     &.g {
@@ -132,7 +135,7 @@ form {
     }
     &.b {
       background: linear-gradient(to right, rgb(255, 255, 255), rgb(0, 0, 255));
-    }
+    } */
   }
 
   .form-range {
@@ -209,21 +212,21 @@ div.sample-color {
   }
 
   .color-count-button {
-    text-align: right;
+    text-align: left;
 
     button {
-      width: 50%;
+      width: 100%;
     }
 
-    .color-count-button-plus {
+    .color-count-button-plus, .color-count-button-minus {
       border-top-right-radius: 0% !important;
       border-bottom-right-radius: 0% !important;
-      border-right: none;
+      /* border-right: none; */
     }
 
-    .color-count-button-minus {
+    /* .color-count-button-minus {
       border-radius: 0% !important;
-    }
+    } */
   }
 
   .color-value {
