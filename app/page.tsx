@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 // import logo from './logo.svg';
 // import './App.scss';
 
@@ -224,7 +224,7 @@ function App() {
     const component = components.find((component) => component.id === id);
 
     let style = {
-      backgroundColor: 'blue', // 初期値
+      backgroundColor: 'gray', // 初期値
       borderRadius: '0%',
     };
     if (component !== undefined) {

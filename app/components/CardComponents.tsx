@@ -1,3 +1,5 @@
+"use client";
+
 import { Dispatch, SetStateAction } from "react";
 import { Card, CardBody, CardHeader, CardText } from "react-bootstrap";
 
@@ -8,10 +10,7 @@ export const getInitialCardCount = () => {
   console.log('・getInitialCardCount')
 
   let localCardCount = null;
-
-  if (process.browser) {
-    localCardCount = localStorage.getItem('cardCount');
-  }
+  localCardCount = localStorage.getItem('cardCount');
 
   if (localCardCount !== null) {
     return JSON.parse(localCardCount);

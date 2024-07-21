@@ -1,3 +1,5 @@
+"use client";
+
 import { Component } from '../types/Component';
 import { getRamdomColor, getRamdomGrayScaleColor, getWhiteColor, getHighLuminanceColor, RGB2HSV, RGB2HSL } from '../components/ColorFunctions';
 import { v4 as uuidv4 } from 'uuid';
@@ -26,9 +28,7 @@ export const getInitialComponents = () => {
   console.log('・getInitialComponents')
 
   let localComponents = null;
-  if (process.browser) {
-    localComponents = localStorage.getItem('components');
-  }
+  localComponents = localStorage.getItem('components');
 
 // console.log(localComponents)
 
