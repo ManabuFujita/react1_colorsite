@@ -28,7 +28,9 @@ export const getInitialComponents = () => {
   console.log('・getInitialComponents')
 
   let localComponents = null;
-  localComponents = localStorage.getItem('components');
+  if (typeof localStorage !== "undefined") {
+    localComponents = localStorage.getItem('components');
+  }
 
 // console.log(localComponents)
 

@@ -10,7 +10,9 @@ export const getInitialCardCount = () => {
   console.log('・getInitialCardCount')
 
   let localCardCount = null;
-  localCardCount = localStorage.getItem('cardCount');
+  if (typeof localStorage !== "undefined") {
+    localCardCount = localStorage.getItem('cardCount');
+  }
 
   if (localCardCount !== null) {
     return JSON.parse(localCardCount);
