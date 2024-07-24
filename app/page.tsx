@@ -578,14 +578,7 @@ function App() {
       const id = uuidv4();
       newColor.id = id;
 
-      // const newComponents = components.map((component) => ({ ...component }));
-
       addComponent(id, newColor, false, true);
-
-      // 2個目に挿入
-      // newComponents.push(newColor)
-
-      // setCurrentColors(newCurrentColors);
 
       if (e !== undefined) {
         e.preventDefault();
@@ -594,11 +587,8 @@ function App() {
     }
 
     const removeSampleCount = (e: React.MouseEvent<HTMLElement>, id: string) => {
-      // setCurrentColors(currentColors.filter((color) => color.id !== id));
 
       removeComponent(id, components, setComponents);
-
-      
 
       if (e !== undefined) {
         e.preventDefault();
@@ -624,7 +614,9 @@ function App() {
           draggable='true' 
           onDragStart={() => handleDragStart(props.e, id)} 
           onClick={() => handleClick(props.e, id)} >
-          {color.id === currentColorId ? 'change color, save with +' : 'drag and drop'}
+          {color.id === currentColorId 
+            ? 'change color, save with +' 
+            : 'drag and drop'}
         </InputGroup.Text>
       </Col>
 
@@ -822,7 +814,7 @@ function App() {
                     </Row>
 
                       <ColorSelectors 
-                        text='色相(H)'
+                        text='H(色相)'
                         id='hsv-h'
                         color={getCurrentColor(components)}
                         colorValue={Math.trunc(getCurrentColor(components).hsv_h)}
@@ -834,7 +826,7 @@ function App() {
                       />
 
                       <ColorSelectors 
-                        text='彩度(S)'
+                        text='S(彩度)'
                         id='hsv-s'
                         color={getCurrentColor(components)}
                         colorValue={Math.trunc(getCurrentColor(components).hsv_s * 1000) / 1000}
@@ -846,7 +838,7 @@ function App() {
                       />
 
                       <ColorSelectors 
-                        text='明度(V)'
+                        text='V(明度)'
                         id='hsv-v'
                         color={getCurrentColor(components)}
                         colorValue={Math.trunc(getCurrentColor(components).hsv_v * 1000) / 1000}
@@ -872,7 +864,7 @@ function App() {
                     </Row>
 
                     <ColorSelectors 
-                        text='色相(H)'
+                        text='H(色相)'
                         id='hsl-h'
                         color={getCurrentColor(components)}
                         colorValue={Math.trunc(getCurrentColor(components).hsl_h)}
@@ -884,7 +876,7 @@ function App() {
                       />
 
                     <ColorSelectors 
-                        text='彩度(S)'
+                        text='S(彩度)'
                         id='hsl-s'
                         color={getCurrentColor(components)}
                         colorValue={Math.trunc(getCurrentColor(components).hsl_s * 1000) / 1000}
@@ -896,7 +888,7 @@ function App() {
                       />
 
                     <ColorSelectors 
-                        text='輝度(L)'
+                        text='L(輝度)'
                         id='hsl-l'
                         color={getCurrentColor(components)}
                         colorValue={Math.trunc(getCurrentColor(components).hsl_l * 1000) / 1000}
@@ -921,7 +913,7 @@ function App() {
                     </Row>
 
                     <ColorSelectors 
-                        text='Cyan'
+                        text='C'
                         id='cmyk-c'
                         color={getCurrentColor(components)}
                         colorValue={Math.trunc(getCurrentColor(components).cmyk_c * 100)}
@@ -933,7 +925,7 @@ function App() {
                       />
 
                     <ColorSelectors 
-                        text='Magenta'
+                        text='M'
                         id='cmyk-m'
                         color={getCurrentColor(components)}
                         colorValue={Math.trunc(getCurrentColor(components).cmyk_m * 100)}
@@ -945,7 +937,7 @@ function App() {
                       />
 
                     <ColorSelectors 
-                        text='Yellow'
+                        text='Y'
                         id='cmyk-y'
                         color={getCurrentColor(components)}
                         colorValue={Math.trunc(getCurrentColor(components).cmyk_y * 100)}
@@ -957,7 +949,7 @@ function App() {
                       />
 
                     <ColorSelectors 
-                        text='Key plate'
+                        text='K'
                         id='cmyk-k'
                         color={getCurrentColor(components)}
                         colorValue={Math.trunc(getCurrentColor(components).cmyk_k * 100)}

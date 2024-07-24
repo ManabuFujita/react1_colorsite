@@ -25,7 +25,7 @@ export const ColorSelectors = ({ text, id, color, colorValue, colorRange, handle
         <div className="col-span-3 md:col-span-2">
           <form>
             <label className="form-label">
-              {text}
+              { text }
               <input type="text" className="form-control" id={id + "-text"} onChange={() => {}} value={colorValue} />
             </label>
           </form>
@@ -45,8 +45,6 @@ export const ColorSelectors = ({ text, id, color, colorValue, colorRange, handle
     </div>
   )
 }
-
-
 
 export const DivColorSelector = ({...props}) => {
   // const id = String(props.id);
@@ -110,7 +108,6 @@ export const DivColorSelector = ({...props}) => {
       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
       break;
 
-
     // HSL
     case "label-hsl-h":
       let colorl1 = { ...props.color };
@@ -148,7 +145,6 @@ export const DivColorSelector = ({...props}) => {
       colorMax = HSL2RGB(colorMax);
       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
       break;
-
     
     // CMYK
     case "label-cmyk-c":
@@ -189,8 +185,8 @@ export const DivColorSelector = ({...props}) => {
 
   // styleを設定してdivタグに変換
   return <div 
-    style={style} 
-    className={className} 
+    style={ style } 
+    className={ className } 
     >
       { props.children }
     </div>
