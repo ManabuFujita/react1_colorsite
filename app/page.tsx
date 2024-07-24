@@ -598,7 +598,7 @@ function App() {
 
     const style = getColorStyle(id);
 
-    const showDetail = component.id === currentColorId || component.isClick;
+    const showDetailCode = component.id === currentColorId || component.isClick;
 
     // styleを設定してdivタグに変換
     return <>
@@ -623,7 +623,7 @@ function App() {
       </Col>
 
       {/* 設定値のコード表示 */}
-      { showDetail
+      { showDetailCode
         ? <>
             <Col className="col color-value rgb align-self-end" xs={2} md={2}></Col>
             <Col className="col color-value rgb align-self-end" xs={10} md={10}>
@@ -690,8 +690,7 @@ function App() {
               <Container>
                 <Row>
                   <Col sm={2}>
-                    {/* <Navbar.Brand>{process.env.REACT_APP_TITLE}</Navbar.Brand> */}
-                    <Navbar.Brand>test</Navbar.Brand>
+                    <Navbar.Brand>{ process.env.NEXT_PUBLIC_REACT_APP_TITLE }</Navbar.Brand>
                   </Col>
                   <Col className="ms-auto"></Col>
                   <Col sm={1}>
