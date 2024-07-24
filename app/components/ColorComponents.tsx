@@ -107,7 +107,7 @@ export const getInitialComponentColor = (id: string): Color => {
 
 export const getMaxSampleColorNo = (components: Component[]) => {
   let maxSampleColorNo = 0;
-  components.map((component) => {
+  components.forEach((component) => {
     if (component.isSampleColor && component.sampleColorNo > maxSampleColorNo) {
       maxSampleColorNo = component.sampleColorNo;
     }
@@ -196,19 +196,18 @@ export const getColorButtonStyle = (buttonName: string,
   switch (buttonName) {
     case 'button_rgb':
       return showColorRGB ? {active: true} : {active: false};
-      break;
+
     case 'button_hsv':
       return showColorHSV ? {active: true} : {active: false};
-      break;
+
     case 'button_hsl':
       return showColorHSL ? {active: true} : {active: false};
-      break;
+
     case 'button_cmyk':
       return showColorCMYK ? {active: true} : {active: false};
-      break;
+
     default:
       return {};
-      break;
   }
   // return showColorSelector ? '' : {style: {display: 'none' }}
 }
@@ -219,8 +218,6 @@ export const getShowColorSelector = (ColorSelectorName: string,
   showColorHSL: boolean,
   showColorCMYK: boolean
 ) => {
-  let obj;
-
 
   switch (ColorSelectorName) {
     case 'rgb':
@@ -236,7 +233,6 @@ export const getShowColorSelector = (ColorSelectorName: string,
       } else {
         return {xxl: 6, style: {display: 'none' }}
       }
-      break;
 
     case 'hsv':
       if (!showColorRGB && showColorHSV && !showColorHSL && !showColorCMYK) {
@@ -246,7 +242,6 @@ export const getShowColorSelector = (ColorSelectorName: string,
       } else {
         return {xxl: 6, style: {display: 'none' }}
       }
-      break;
 
     case 'hsl':
       if (!showColorRGB && !showColorHSV && showColorHSL && !showColorCMYK) {
@@ -256,7 +251,6 @@ export const getShowColorSelector = (ColorSelectorName: string,
       } else {
         return {xxl: 6, style: {display: 'none' }}
       }
-      break;
 
     case 'cmyk':
       if (!showColorRGB && !showColorHSV && !showColorHSL && showColorCMYK) {
@@ -266,11 +260,9 @@ export const getShowColorSelector = (ColorSelectorName: string,
       } else {
         return {xxl: 6, style: {display: 'none' }}
       }
-      break;
 
     default:
       return {};
-      break;
   }
 }
 

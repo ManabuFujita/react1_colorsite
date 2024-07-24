@@ -532,7 +532,7 @@ function App() {
     const currentColors = getSampleColors(components);
 
     const array: any = [];
-    currentColors.map((component: Component) => {
+    currentColors.forEach((component: Component) => {
       array.push(
         <Row key={ component.id } 
              {...component.color.id === currentColorId 
