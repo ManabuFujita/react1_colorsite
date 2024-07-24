@@ -65,7 +65,7 @@ function App() {
   useEffect(() => {
     console.log('load page')
 
-    setComponents(getInitialComponents());
+    // setComponents(getInitialComponents());
 
     const onResize = () => {
       // 画面の高さを再計算
@@ -582,28 +582,30 @@ function App() {
     const array: any = [];
     currentColors.map((component: Component) => {
       array.push(
-        <>
-          <Row {...component.color.id === currentColorId ? {className: 'my-2 pb-3 border-bottom'} : {className: 'my-2'}}>
+        <Row key={ component.id } 
+             {...component.color.id === currentColorId 
+             ? {className: 'my-2 pb-3 border-bottom'} 
+             : {className: 'my-2'}}>
 
-            <InputGroup className='sample-color-row'>
+          <InputGroup className='sample-color-row'>
 
-              <Container fluid="md">
-                <Row className='sample-color justify-content-end justify-content-md-center'>
+            <Container fluid="md">
+              <Row className='sample-color justify-content-end justify-content-md-center'>
 
-                  {/* カラーバー */}
-                  {DivSampleColor({...props}, component.color)}
+                {/* カラーバー */}
+                { DivSampleColor({...props}, component.color) } 
 
-                </Row>
-              </Container>
+              </Row>
+            </Container>
 
-              </InputGroup>
-          </Row>
-        </>);
+            </InputGroup>
+        </Row>
+        );
     })
 
     return <>
       <Container className='my-2'>
-        {array}
+        { array }
       </Container>
     </>;
   }
