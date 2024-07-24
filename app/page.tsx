@@ -545,7 +545,7 @@ function App() {
               <Row className='sample-color justify-content-end justify-content-md-center'>
 
                 {/* カラーバー */}
-                { DivSampleColor({...props}, component.color) } 
+                { DivSampleColor({...props}, component, component.color) } 
 
               </Row>
             </Container>
@@ -562,7 +562,7 @@ function App() {
     </>;
   }
 
-  const DivSampleColor = ({...props}, color: Color) => {
+  const DivSampleColor = ({...props}, component: Component, color: Color) => {
 
     const id = color.id === currentColorId ? currentColorId : color.id;
 
@@ -598,6 +598,8 @@ function App() {
 
     const style = getColorStyle(id);
 
+    const showDetail = component.id === currentColorId || component.isClick;
+
     // styleを設定してdivタグに変換
     return <>
       <Col className="col color-count-button" xs={2} md={2}>
@@ -620,21 +622,28 @@ function App() {
         </InputGroup.Text>
       </Col>
 
-      <Col className="col color-value rgb align-self-end" xs={2} md={2}></Col>
-      <Col className="col color-value rgb align-self-end" xs={10} md={10}>
-        <Form.Control placeholder="rgb" aria-label="rgb" id={'copy-button-rgb'+id} value={getRGBCodeFromRGB(color)} readOnly />
-        <CopyButton copyText={getRGBCodeFromRGB(color)} inputId={'copy-button-rgb'+id} />
-      </Col>
-      <Col className="col color-value rgb align-self-end" xs={2} md={2}></Col>
-      <Col className="col color-value hex" xs={10} md={10}>
-        <Form.Control placeholder="hex" aria-label="hex" id={'copy-button-hex'+id} value={getHexCodeFromRGB(color)} readOnly />
-        <CopyButton copyText={getHexCodeFromRGB(color)} inputId={'copy-button-hex'+id} />
-      </Col>
-      <Col className="col color-value rgb align-self-end" xs={2} md={2}></Col>
-      <Col className="col color-value hsl" xs={10} md={10}>
-        <Form.Control placeholder="hsl" aria-label="hsl" id={'copy-button-hsl'+id} value={getHSLCodeFromRGB(color)} readOnly />
-        <CopyButton copyText={getHSLCodeFromRGB(color)} inputId={'copy-button-hsl'+id} />
-      </Col>
+      {/* 設定値のコード表示 */}
+      { showDetail
+        ? <>
+            <Col className="col color-value rgb align-self-end" xs={2} md={2}></Col>
+            <Col className="col color-value rgb align-self-end" xs={10} md={10}>
+              <Form.Control placeholder="rgb" aria-label="rgb" id={'copy-button-rgb'+id} value={getRGBCodeFromRGB(color)} readOnly />
+              <CopyButton copyText={getRGBCodeFromRGB(color)} inputId={'copy-button-rgb'+id} />
+            </Col>
+            <Col className="col color-value rgb align-self-end" xs={2} md={2}></Col>
+            <Col className="col color-value hex" xs={10} md={10}>
+              <Form.Control placeholder="hex" aria-label="hex" id={'copy-button-hex'+id} value={getHexCodeFromRGB(color)} readOnly />
+              <CopyButton copyText={getHexCodeFromRGB(color)} inputId={'copy-button-hex'+id} />
+            </Col>
+            <Col className="col color-value rgb align-self-end" xs={2} md={2}></Col>
+            <Col className="col color-value hsl" xs={10} md={10}>
+              <Form.Control placeholder="hsl" aria-label="hsl" id={'copy-button-hsl'+id} value={getHSLCodeFromRGB(color)} readOnly />
+              <CopyButton copyText={getHSLCodeFromRGB(color)} inputId={'copy-button-hsl'+id} />
+            </Col>
+          </>
+        : <></>
+      }
+
 
     </>
   };
