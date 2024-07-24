@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
+
 // import logo from './logo.svg';
 // import './App.scss';
 
@@ -39,7 +41,7 @@ import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import { faPalette, faBrush } from "@fortawesome/free-solid-svg-icons";
 import { ColorSelectors, DivColorSelector } from './components/ColorSelectors';
 
-
+const Wrapper = dynamic(() => import('./components/Wrapper'), { ssr: false });
 function App() {
 
   // メニューバー
@@ -63,6 +65,8 @@ function App() {
   useEffect(() => {
     console.log('load page')
 
+    setComponents(getInitialComponents());
+
     const onResize = () => {
       // 画面の高さを再計算
       // setAppHeight(window.innerHeight);
@@ -71,6 +75,8 @@ function App() {
     }
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
+
+
   }, []);
 
   // useEffect(() => {
@@ -960,7 +966,9 @@ function App() {
 
 
   return (
-    // <div className="App" onClick={() => {handleClickClear()}}>
+    <>
+    <Wrapper>
+
     <div className="App" ref={appRef}>
 
 
@@ -1324,35 +1332,10 @@ function App() {
       {/* </BrowserRouter> */}
 
     </div>
+
+    </Wrapper>
+    </>
   );
 }
-
-
-// function Home() {
-//   return (
-//     <>
-//       <h1>Home</h1>
-//       <p>This is the home page of my SPA site.</p>
-//     </>
-//   );
-// }
-
-// function About() {
-//   return (
-//     <>
-//       <h1>About</h1>
-//       <p>This is the about page of my SPA site.</p>
-//     </>
-//   );
-// }
-
-// function Contact() {
-//   return (
-//     <>
-//       <h1>Contact</h1>
-//       <p>This is the contact page of my SPA site.</p>
-//     </>
-//   );
-// }
 
 export default App;
