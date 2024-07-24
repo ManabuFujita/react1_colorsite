@@ -1,7 +1,6 @@
 "use client";
 
 import { Dispatch, SetStateAction } from "react";
-import { Card, CardBody, CardHeader, CardText } from "react-bootstrap";
 
 const initialCardCountValue = 1;
 

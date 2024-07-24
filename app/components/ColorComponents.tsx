@@ -1,7 +1,7 @@
 "use client";
 
 import { Component } from '../types/Component';
-import { getRamdomColor, getRamdomGrayScaleColor, getWhiteColor, getHighLuminanceColor, RGB2HSV, RGB2HSL } from '../components/ColorFunctions';
+import { getRamdomColor, getRamdomGrayScaleColor, getWhiteColor, RGB2HSV, RGB2HSL } from '../components/ColorFunctions';
 import { v4 as uuidv4 } from 'uuid';
 import { Dispatch, SetStateAction } from 'react';
 import { Color } from '../types/Color';

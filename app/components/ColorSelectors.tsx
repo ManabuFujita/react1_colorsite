@@ -1,7 +1,6 @@
 "use client";
 
 import { Color } from "../types/Color";
-import { getCurrentColor } from "./ColorComponents";
 import { CMYK2RGB, HSL2RGB, HSV2RGB, getRGBCodeFromRGB } from "./ColorFunctions";
 
 interface ColorSelectorProps {

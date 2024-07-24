@@ -1,16 +1,10 @@
 "use client";
 
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 
-// import logo from './logo.svg';
-// import './App.scss';
 
-// import Color from './components/Color';
-import { RGB2HSV, RGB2HSL, RGB2CMYK, HSV2RGB, HSL2RGB, CMYK2RGB } from './components/ColorFunctions';
-import { getRamdomColor, getRamdomGrayScaleColor, getWhiteColor, getHighLuminanceColor } from './components/ColorFunctions';
-// import { newColorFromRGB, newColorFromHSV, newColorFromHSL, newColorFromCMYK } from './components/ColorFunctions';
-import { changeColor } from './components/ColorFunctions';
+import { getRamdomColor } from './components/ColorFunctions';
 import { getRGBCodeFromRGB, getHexCodeFromRGB, getHSLCodeFromRGB } from './components/ColorFunctions';
 
 import { getSampleColors, getInitialComponents, getCurrentColor, getInitialComponentColor, 
@@ -27,7 +21,7 @@ import { Color } from './types/Color';
 import { useState } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { BrowserRouter, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Container, Navbar, Nav, Offcanvas, Button, Row, Col, InputGroup, Card, CardHeader, CardBody, CardText, ButtonToolbar, ButtonGroup, Form, NavbarBrand } from 'react-bootstrap';
 
 
@@ -39,7 +33,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import { faPalette, faBrush } from "@fortawesome/free-solid-svg-icons";
-import { ColorSelectors, DivColorSelector } from './components/ColorSelectors';
+import { ColorSelectors } from './components/ColorSelectors';
 
 const Wrapper = dynamic(() => import('./components/Wrapper'), { ssr: false });
 function App() {
@@ -107,23 +101,6 @@ function App() {
   const bodyRef = useRef<HTMLDivElement>(null);  
   const footerRef = useRef<HTMLDivElement>(null);
 
-  // localStorageのcurrentColorsをクリア
-  // const clearCurrentColors = () => {
-  //   localStorage.removeItem('currentColors');
-  //   console.log('◆clearCurrentColors')
-  // }
-
-  // localStorageのcomponentsをクリア
-  // const clearComponents = () => {
-  //   localStorage.removeItem('components');
-  //   console.log('◆clearComponents')
-  // }
-
-  // localStorageのcardCountをクリア
-  // const clearCardCount = () => {
-  //   localStorage.removeItem('cardCount');
-  //   console.log('◆clearCardCount')
-  // }
 
   // 設定をクリアする
   const resetPage = () => {
@@ -321,17 +298,7 @@ function App() {
   };
 
   
-  // // カード
-  // const addCard = () => {
-  //   setCardCount(cardCount + 1);
-  // }
-
-  // const removeCard = () => {
-  //   if (cardCount > 0) {
-  //     setCardCount(cardCount - 1);
-  //   }
-  // }
-
+  // カード
   const DivCard = ({...props}) => {
     // const id = String(props.id);
 
@@ -561,21 +528,6 @@ function App() {
     )
   }
 
-  // // componentsからsample colorを取得する
-  // const getSampleColors = () => {
-  //   let sampleColors = [];
-
-  //   const sampleColorsFilter = components.filter((component) => component.isSampleColor);
-  //   if (sampleColorsFilter === undefined) {
-  //     sampleColors = getInitialComponents();
-  //   } else {
-  //     sampleColors = sampleColorsFilter;
-  //   }
-
-  //   return sampleColors;
-  // }
-
-
   const DivSampleColors = ({...props}) => {
     const currentColors = getSampleColors(components);
 
@@ -695,154 +647,6 @@ function App() {
     </>
   };
 
-  
-
-  
-  // const DivColorSelector2 = ({...props}) => {
-  //   const id = String(props.id);
-
-  //   const color = getCurrentColor(components);
-
-  //   const className = 'color-bar-change';
-
-  //   // let colorMin = {...getCurrentColor(components)};
-  //   // let colorMax = {...getCurrentColor(components)};
-  //   let colorMin = { ...color };
-  //   let colorMax = { ...color };
-  //   let style;
-
-  //   switch (id) {
-
-  //     // HSV
-  //     case "label-hsv-h":
-  //       // let colorv1 = {...getCurrentColor(components)};
-  //       // let colorv2 = {...getCurrentColor(components)};
-  //       // let colorv3 = {...getCurrentColor(components)};
-  //       // let colorv4 = {...getCurrentColor(components)};
-  //       let colorv1 = { ...color };
-  //       let colorv2 = { ...color };
-  //       let colorv3 = { ...color };
-  //       let colorv4 = { ...color };
-  //       colorv1['hsv_h'] = 0;
-  //       colorv2['hsv_h'] = 90;
-  //       colorv3['hsv_h'] = 180;
-  //       colorv4['hsv_h'] = 270;
-  //       colorv1 = HSV2RGB(colorv1);
-  //       colorv2 = HSV2RGB(colorv2);
-  //       colorv3 = HSV2RGB(colorv3);
-  //       colorv4 = HSV2RGB(colorv4);
-  //       style = { background: "linear-gradient(to right, " 
-  //         + getRGBCodeFromRGB(colorv1) + ", " 
-  //         + getRGBCodeFromRGB(colorv2) + ", " 
-  //         + getRGBCodeFromRGB(colorv3) + ", " 
-  //         + getRGBCodeFromRGB(colorv4) + ", " 
-  //         + getRGBCodeFromRGB(colorv1) + ")" };
-  //       break;
-
-  //     case "label-hsv-s":
-  //       colorMin['hsv_s'] = 0;
-  //       colorMax['hsv_s'] = 1;
-  //       colorMin = HSV2RGB(colorMin);
-  //       colorMax = HSV2RGB(colorMax);
-  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-  //       break;
-
-  //     case "label-hsv-v":
-  //       colorMin['hsv_v'] = 0;
-  //       colorMax['hsv_v'] = 1;
-  //       colorMin = HSV2RGB(colorMin);
-  //       colorMax = HSV2RGB(colorMax);
-  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-  //       break;
-
-
-  //     // HSL
-  //     case "label-hsl-h":
-  //       let colorl1 = {...getCurrentColor(components)};
-  //       let colorl2 = {...getCurrentColor(components)};
-  //       let colorl3 = {...getCurrentColor(components)};
-  //       let colorl4 = {...getCurrentColor(components)};
-  //       colorl1['hsl_h'] = 0;
-  //       colorl2['hsl_h'] = 90;
-  //       colorl3['hsl_h'] = 180;
-  //       colorl4['hsl_h'] = 270;
-  //       colorl1 = HSL2RGB(colorl1);
-  //       colorl2 = HSL2RGB(colorl2);
-  //       colorl3 = HSL2RGB(colorl3);
-  //       colorl4 = HSL2RGB(colorl4);
-  //       style = { background: "linear-gradient(to right, " 
-  //         + getRGBCodeFromRGB(colorl1) + ", " 
-  //         + getRGBCodeFromRGB(colorl2) + ", " 
-  //         + getRGBCodeFromRGB(colorl3) + ", " 
-  //         + getRGBCodeFromRGB(colorl4) + ", " 
-  //         + getRGBCodeFromRGB(colorl1) + ")" };
-  //       break;
-
-  //     case "label-hsl-s":
-  //       colorMin['hsl_s'] = 0;
-  //       colorMax['hsl_s'] = 1;
-  //       colorMin = HSL2RGB(colorMin);
-  //       colorMax = HSL2RGB(colorMax);
-  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-  //       break;
-
-  //     case "label-hsl-l":
-  //       colorMin['hsl_l'] = 0;
-  //       colorMax['hsl_l'] = 1;
-  //       colorMin = HSL2RGB(colorMin);
-  //       colorMax = HSL2RGB(colorMax);
-  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-  //       break;
-
-      
-  //     // CMYK
-  //     case "label-cmyk-c":
-  //       colorMin['cmyk_c'] = 0;
-  //       colorMax['cmyk_c'] = 1;
-  //       colorMin = CMYK2RGB(colorMin);
-  //       colorMax = CMYK2RGB(colorMax);
-  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-  //       break;
-
-  //     case "label-cmyk-m":
-  //       colorMin['cmyk_m'] = 0;
-  //       colorMax['cmyk_m'] = 1;
-  //       colorMin = CMYK2RGB(colorMin);
-  //       colorMax = CMYK2RGB(colorMax);
-  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-  //       break;
-
-  //     case "label-cmyk-y":
-  //       colorMin['cmyk_y'] = 0;
-  //       colorMax['cmyk_y'] = 1;
-  //       colorMin = CMYK2RGB(colorMin);
-  //       colorMax = CMYK2RGB(colorMax);
-  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-  //       break;
-      
-  //     case "label-cmyk-k":
-  //       colorMin['cmyk_k'] = 0;
-  //       colorMax['cmyk_k'] = 1;
-  //       colorMin = CMYK2RGB(colorMin);
-  //       colorMax = CMYK2RGB(colorMax);
-  //       style = { background: "linear-gradient(to right, " + getRGBCodeFromRGB(colorMin) + ", " + getRGBCodeFromRGB(colorMax) + ")" };
-  //       break;
-
-  //     default:
-  //       break;
-  //   }
-
-  //   // styleを設定してdivタグに変換
-  //   return <div 
-  //     style={style} 
-  //     className={className} 
-  //     >
-  //       { props.children }
-  //     </div>
-  // };
-
-
-
   // 表示・非表示機能
   const [showColorSelector, setShowColorSelector] = useState<boolean>(true);
   const [showSampleColor, setShowSampleColor] = useState<boolean>(true);
@@ -869,103 +673,6 @@ function App() {
   const [showColorHSV, setShowColorHSV] = useState<boolean>(true);
   const [showColorHSL, setShowColorHSL] = useState<boolean>(true);
   const [showColorCMYK, setShowColorCMYK] = useState<boolean>(true);
-
-  // const handleToggleColorButton = (buttonName: string) => {
-  //   switch (buttonName) {
-  //     case 'button_rgb':
-  //       setShowColorRGB(!showColorRGB);
-  //       break;
-  //     case 'button_hsv':
-  //       setShowColorHSV(!showColorHSV);
-  //       break;
-  //     case 'button_hsl':
-  //       setShowColorHSL(!showColorHSL);
-  //       break;
-  //     case 'button_cmyk':
-  //       setShowColorCMYK(!showColorCMYK);
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // }
-
-  // const getColorButtonStyle = (buttonName: string) => {
-  //   switch (buttonName) {
-  //     case 'button_rgb':
-  //       return showColorRGB ? {active: true} : {active: false};
-  //       break;
-  //     case 'button_hsv':
-  //       return showColorHSV ? {active: true} : {active: false};
-  //       break;
-  //     case 'button_hsl':
-  //       return showColorHSL ? {active: true} : {active: false};
-  //       break;
-  //     case 'button_cmyk':
-  //       return showColorCMYK ? {active: true} : {active: false};
-  //       break;
-  //     default:
-  //       return {};
-  //       break;
-  //   }
-  //   // return showColorSelector ? '' : {style: {display: 'none' }}
-  // }
-
-  // const getShowColorSelector = (ColorSelectorName: string) => {
-  //   let obj;
-
-
-  //   switch (ColorSelectorName) {
-  //     case 'rgb':
-  //       if (showColorRGB && showColorHSV && showColorHSL) {
-  //         // 全表示
-  //         return {xxl: 12, className: 'border-bottom'} 
-  //       } else if (showColorRGB && !showColorHSV && !showColorHSL && !showColorCMYK) {
-  //         // RGBのみ表示
-  //         return {xxl: 12, } 
-  //       } else if (showColorRGB) {
-  //         // RGBは表示状態
-  //         return {xxl: 6, }
-  //       } else {
-  //         return {xxl: 6, style: {display: 'none' }}
-  //       }
-  //       break;
-
-  //     case 'hsv':
-  //       if (!showColorRGB && showColorHSV && !showColorHSL && !showColorCMYK) {
-  //         return {xxl: 12, } 
-  //       } else if (showColorHSV) {
-  //         return {xxl: 6, }
-  //       } else {
-  //         return {xxl: 6, style: {display: 'none' }}
-  //       }
-  //       break;
-
-  //     case 'hsl':
-  //       if (!showColorRGB && !showColorHSV && showColorHSL && !showColorCMYK) {
-  //         return {xxl: 12, } 
-  //       } else if (showColorHSL) {
-  //         return {xxl: 6, }
-  //       } else {
-  //         return {xxl: 6, style: {display: 'none' }}
-  //       }
-  //       break;
-
-  //     case 'cmyk':
-  //       if (!showColorRGB && !showColorHSV && !showColorHSL && showColorCMYK) {
-  //         return {xxl: 12, } 
-  //       } else if (showColorCMYK) {
-  //         return {xxl: 6, }
-  //       } else {
-  //         return {xxl: 6, style: {display: 'none' }}
-  //       }
-  //       break;
-
-  //     default:
-  //       return {};
-  //       break;
-  //   }
-  // }
-
 
   return (
     <>
@@ -1329,8 +1036,6 @@ function App() {
 
         </Navbar>
         
-
-
       {/* </BrowserRouter> */}
 
     </div>
