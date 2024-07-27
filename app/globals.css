@@ -99,6 +99,14 @@ nav.footer {
   z-index: 0;
 }
 
+/* 表示・非表示ボタン */
+.hide-button {
+  &:hover {
+    background-color: rgb(93, 160, 255) !important;
+    transition-delay: 0.1s;
+  }
+}
+
 /* カラーバー */
 .color-bars {
   z-index: 1;
