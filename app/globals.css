@@ -1,41 +1,42 @@
-/* .App {
-  text-align: center;
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+@import "~tailwindcss/base";
+@import "~tailwindcss/components";
+@import "~tailwindcss/utilities";
+
+:root {
+  /* --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255; */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0; */
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+/* @layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
 } */
+
+
+
 
 html {
   height: 100%;
@@ -89,13 +90,21 @@ nav.footer {
 }
 
 #body-background {
-  // position: absolute;
+  /* // position: absolute; */
   position: absolute;
   width: 100%;
-  // min-height: 100vh;
+  /* // min-height: 100vh; */
   height: 100vh;
   top: 70px;
   z-index: 0;
+}
+
+/* 表示・非表示ボタン */
+.hide-button {
+  &:hover {
+    background-color: rgb(93, 160, 255) !important;
+    transition-delay: 0.1s;
+  }
 }
 
 /* カラーバー */
@@ -104,7 +113,7 @@ nav.footer {
 }
 
 .color-space-name {
-  // font-size: large !important;
+  /* // font-size: large !important; */
   margin-left: 4px;
   font-weight: bold;
 }
@@ -126,7 +135,7 @@ form {
     content: "";
     /* display: inline-block; */
 
-    &.r {
+    /* &.r {
       background: linear-gradient(to right, rgb(255, 255, 255), rgb(255, 0, 0));
     }
     &.g {
@@ -134,7 +143,7 @@ form {
     }
     &.b {
       background: linear-gradient(to right, rgb(255, 255, 255), rgb(0, 0, 255));
-    }
+    } */
   }
 
   .form-range {
@@ -211,21 +220,21 @@ div.sample-color {
   }
 
   .color-count-button {
-    text-align: right;
+    text-align: left;
 
     button {
-      width: 50%;
+      width: 100%;
     }
 
-    .color-count-button-plus {
+    .color-count-button-plus, .color-count-button-minus {
       border-top-right-radius: 0% !important;
       border-bottom-right-radius: 0% !important;
-      border-right: none;
+      /* border-right: none; */
     }
 
-    .color-count-button-minus {
+    /* .color-count-button-minus {
       border-radius: 0% !important;
-    }
+    } */
   }
 
   .color-value {
