@@ -40,7 +40,7 @@ jobs:
           command: mkdir -p ~/.ssh && ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
       - run:
           name: Deploy static export via rsync
-          command: rsync -az --delete -e "ssh -p $SSH_PORT" out/ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
+          command: rsync -avz --delete --stats -e "ssh -p $SSH_PORT" out/ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
 
 workflows:
   build_and_deploy:
