@@ -1024,7 +1024,7 @@ function App() {
                     <Row>
                       <Col className="ms-auto"></Col>
                       <Col md={4}>
-                        <span>&copy; 2024 My SPA Site. All rights reserved.</span>
+                        <span>&copy; 2024 Design Palette. All rights reserved.</span>
                       </Col>
                       <Col className="ms-auto"></Col>
                     </Row>
