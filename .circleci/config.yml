@@ -1,23 +1,54 @@
 version: 2.1
+
 jobs:
   build:
-    working_directory: ~/repo
     docker:
-      - image: circleci/node:10.16.3
+      - image: cimg/node:20.16
+    working_directory: ~/repo
     steps:
       - checkout
-      - run:
-          name: Update NPM
-          command: "sudo npm install -g npm@5"
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
           name: Install Dependencies
-          command: npm install
+          command: npm ci
       - save_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
-            - ./node_modules
+            - ~/.npm
       - run:
-          name: Run tests
-          command: npm run test
+          name: Build (next build / static export)
+          command: npm run build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - out
+
+  deploy:
+    docker:
+      - image: cimg/node:20.16
+    working_directory: ~/repo
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install rsync
+          command: sudo apt-get update && sudo apt-get install -y rsync
+      - add_ssh_keys
+      - run:
+          name: Add Lolipop host key
+          command: mkdir -p ~/.ssh && ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
+      - run:
+          name: Deploy static export via rsync
+          command: rsync -az --delete -e "ssh -p $SSH_PORT" out/ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
+
+workflows:
+  build_and_deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: main
