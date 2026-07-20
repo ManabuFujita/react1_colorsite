@@ -300,7 +300,9 @@ export const useColorEditor = () => {
       const deepCopy = components.map((component) => ({ ...component }));
       const newComponents = deepCopy.map((component) => {
         if (component.id === id) {
-          component.color = dragColor;
+          // dragColorをそのまま参照させると色オブジェクトがドラッグ元と共有されてしまうため、
+          // 値だけをコピーし、自分自身のcolor.idは維持する
+          component.color = { ...dragColor, id: component.color.id };
         }
         return component;
       });

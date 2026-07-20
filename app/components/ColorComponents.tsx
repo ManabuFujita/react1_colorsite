@@ -139,7 +139,7 @@ export const setOneRGBHSV = (colorName: string, colorValue: number, componentId:
 
   const deepCopy = components.map((component) => ({ ...component }));
   const newComponent = deepCopy.map((component) => {
-    if (component.id === currentColorId || component.color.id === componentId) {
+    if (component.id === currentColorId || component.id === componentId) {
 
       let newColor = component.color;
       newColor[colorName] = colorValue;
