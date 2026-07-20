@@ -340,7 +340,7 @@ function App() {
             id={'card-body-' + (i + 1).toString()} 
             style={styleBody} >
             <CardText>Body</CardText>
-            <CardText>select and change color</CardText>
+            <CardText>Select to change color</CardText>
           </CardBody>
 
           <Card.Footer className='can-select' 
@@ -616,8 +616,8 @@ function App() {
           draggable='true' 
           onDragStart={() => handleDragStart(props.e, id)} 
           onClick={() => handleClick(props.e, id)} >
-          {color.id === currentColorId 
-            ? 'change color, save with +' 
+          {color.id === currentColorId
+            ? 'Change color, then save with +'
             : 'drag and drop'}
         </InputGroup.Text>
       </Col>
