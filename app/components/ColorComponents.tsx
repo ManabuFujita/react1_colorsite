@@ -70,7 +70,7 @@ const getInitialRamdomColorComponent = () => {
   let component: Component = {
     id: id,
     isSampleColor: true,
-    isCurrentColor: true,
+    isCurrentColor: false,
     isHover: false,
     isClick: false,
     color: getRamdomGrayScaleColor(id),
@@ -139,7 +139,7 @@ export const setOneRGBHSV = (colorName: string, colorValue: number, componentId:
 
   const deepCopy = components.map((component) => ({ ...component }));
   const newComponent = deepCopy.map((component) => {
-    if (component.isCurrentColor || component.color.id === componentId) {
+    if (component.id === currentColorId || component.color.id === componentId) {
 
       let newColor = component.color;
       newColor[colorName] = colorValue;
