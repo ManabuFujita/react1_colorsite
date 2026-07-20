@@ -9,7 +9,9 @@ type SampleColorSectionProps = Pick<ReturnType<typeof useColorEditor>,
   'components' | 'setComponents' | 'addComponent' | 'getColorStyle' | 'handleClick' | 'handleDragStart'
 >;
 
-/** 保存済みサンプルカラー一覧の表示/非表示トグルと、一覧本体をまとめたセクション。 */
+/**
+ * 保存済みサンプルカラー一覧の表示/非表示トグルと、一覧本体をまとめたセクション。
+ */
 export const SampleColorSection = ({ components, setComponents, addComponent, getColorStyle, handleClick, handleDragStart }: SampleColorSectionProps) => {
   const [showSampleColor, setShowSampleColor] = useState<boolean>(true);
 

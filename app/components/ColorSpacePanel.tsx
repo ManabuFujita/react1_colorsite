@@ -73,7 +73,10 @@ type ColorSpacePanelProps = {
   showColorCMYK: boolean;
 };
 
-// RGB/HSV/HSL/CMYKそれぞれの色調整パネル(以前は4箇所にコピペされていた)
+/**
+ * RGB・HSV・HSL・CMYKいずれかの色空間のスライダー群を表示するパネル。
+ * どの値をどの範囲・精度で表示するかは、呼び出し側から渡す`config`({@link colorSpaceConfigs}の要素)で決まる。
+ */
 export const ColorSpacePanel = ({ config, color, handleChangeRange, showColorRGB, showColorHSV, showColorHSL, showColorCMYK }: ColorSpacePanelProps) => {
   return (
     <Col {...getShowColorSelector(config.id, showColorRGB, showColorHSV, showColorHSL, showColorCMYK)}>

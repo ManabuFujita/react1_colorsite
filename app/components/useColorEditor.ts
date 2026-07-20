@@ -17,7 +17,11 @@ import { getInitialCardCount } from './CardComponents';
 
 const currentColorId = 'sample-color';
 
-// components/cardCountのstateと、それに紐づくハンドラ群
+/**
+ * 選択中の色・保存済みサンプルカラー・カード枚数といったアプリの状態と、それらを操作するハンドラ
+ * (クリックによる選択、ドラッグ&ドロップ、スライダー操作など)をまとめたカスタムフック。
+ * 状態はcomponents配列としてlocalStorageに永続化される。
+ */
 export const useColorEditor = () => {
   const [components, setComponents] = useState<Component[]>(getInitialComponents());
   const [cardCount, setCardCount] = useState<number>(getInitialCardCount());

@@ -16,6 +16,10 @@ interface ColorSelectorProps {
   step: number;
 }
 
+/**
+ * 色の成分1つ(例: R、H(色相))を調整するスライダーUI。
+ * ラベル・数値入力・レンジ入力に加え、選択可能な値の範囲を示すグラデーション背景を表示する。
+ */
 export const ColorSelectors = ({ text, id, color, colorValue, colorRange, handleChangeRange, min, max, step }: ColorSelectorProps) => {
   return (
     <div>
@@ -46,6 +50,9 @@ export const ColorSelectors = ({ text, id, color, colorValue, colorRange, handle
   )
 }
 
+/**
+ * スライダーの背景に表示するグラデーションバー。対象の成分に応じて、取り得る値の範囲を色で表す。
+ */
 export const DivColorSelector = ({...props}) => {
   // const id = String(props.id);
 

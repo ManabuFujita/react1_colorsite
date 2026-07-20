@@ -11,7 +11,10 @@ type CopyButtonProps = {
   inputId: string;
 };
 
-/** ボタン押下でテキストをクリップボードにコピーする。コピー直後の数秒間は再押下できないようdisabledにする。 */
+/**
+ * ボタン押下でテキストをクリップボードにコピーする。
+ * コピー直後の数秒間は再押下できないようdisabledにする。
+ */
 export const CopyButton = ({ copyText, inputId }: CopyButtonProps) => {
   const [isCopied, setIsCopied] = useState(false)
 

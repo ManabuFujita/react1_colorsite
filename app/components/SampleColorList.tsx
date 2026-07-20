@@ -59,7 +59,10 @@ type SampleColorProps = SampleColorListProps & {
   color: Color;
 };
 
-/** サンプルカラー1件分の表示。スウォッチ・追加/削除ボタンに加え、選択中はRGB/HEX/HSLコードも表示する。 */
+/**
+ * サンプルカラー1件分の表示。
+ * スウォッチ・追加/削除ボタンに加え、選択中はRGB/HEX/HSLコードも表示する。
+ */
 const DivSampleColor = ({ component, color, components, setComponents, addComponent, getColorStyle, handleClick, handleDragStart }: SampleColorProps) => {
 
   const id = color.id === currentColorId ? currentColorId : color.id;

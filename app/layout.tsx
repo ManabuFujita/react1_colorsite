@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   description: "RGB・HEX・HSLのカラーコードを生成して配色を確認できるカラーパレットツール",
 };
 
+/**
+ * アプリ全体のルートレイアウト。
+ * 全ページ共通の`<html>`/`<body>`とフォント設定を提供する(Next.js App Routerの規約に基づくファイル)。
+ */
 export default function RootLayout({
   children,
 }: Readonly<{

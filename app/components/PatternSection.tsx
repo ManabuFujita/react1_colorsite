@@ -9,7 +9,9 @@ type PatternSectionProps = Pick<ReturnType<typeof useColorEditor>,
   'cardCount' | 'setCardCount' | 'addComponent' | 'getColorStyle' | 'handleClick' | 'handleDragStart' | 'handleDragOver' | 'handleDrop'
 >;
 
-/** Header/Body/Footerのカードパターンを+/-で増減させながら表示するセクション。 */
+/**
+ * Header/Body/Footerのカードパターンを+/-で増減させながら表示するセクション。
+ */
 export const PatternSection = ({ cardCount, setCardCount, addComponent, getColorStyle, handleClick, handleDragStart, handleDragOver, handleDrop }: PatternSectionProps) => {
   return (
     <Row className="mt-5" id="card" >

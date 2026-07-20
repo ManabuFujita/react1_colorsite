@@ -8,7 +8,10 @@ type PageFooterProps = Pick<ReturnType<typeof useColorEditor>,
   'footerRef' | 'addComponent' | 'getColorStyle' | 'handleClick' | 'handleDragStart' | 'handleDragOver' | 'handleDrop'
 >;
 
-/** フッター(コピーライト表記)。DivColorでラップしているため背景色も変更できる。 */
+/**
+ * フッター(コピーライト表記)。
+ * DivColorでラップしているため背景色も変更できる。
+ */
 export const PageFooter = ({ footerRef, addComponent, getColorStyle, handleClick, handleDragStart, handleDragOver, handleDrop }: PageFooterProps) => {
   return (
     <Navbar expand="lg" fixed="bottom" className='footer' ref={footerRef}>

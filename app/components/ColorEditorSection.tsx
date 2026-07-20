@@ -8,7 +8,9 @@ import { ColorSpacePanel, colorSpaceConfigs } from './ColorSpacePanel';
 
 type ColorEditorSectionProps = Pick<ReturnType<typeof useColorEditor>, 'components' | 'handleChangeRange'>;
 
-/** RGB/HSV/HSL/CMYKの表示切り替えボタンと、各色空間の調整パネルをまとめたセクション。 */
+/**
+ * RGB/HSV/HSL/CMYKの表示切り替えボタンと、各色空間の調整パネルをまとめたセクション。
+ */
 export const ColorEditorSection = ({ components, handleChangeRange }: ColorEditorSectionProps) => {
   // 表示・非表示機能
   const [showColorSelector, setShowColorSelector] = useState<boolean>(true);

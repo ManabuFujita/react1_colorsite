@@ -8,7 +8,10 @@ type PageHeaderProps = Pick<ReturnType<typeof useColorEditor>,
   'headerRef' | 'resetPage' | 'addComponent' | 'getColorStyle' | 'handleClick' | 'handleDragStart' | 'handleDragOver' | 'handleDrop'
 >;
 
-/** ヘッダー(サイトタイトル + Resetボタン)。DivColorでラップしているため背景色も変更できる。 */
+/**
+ * ヘッダー(サイトタイトル + Resetボタン)。
+ * DivColorでラップしているため背景色も変更できる。
+ */
 export const PageHeader = ({ headerRef, resetPage, addComponent, getColorStyle, handleClick, handleDragStart, handleDragOver, handleDrop }: PageHeaderProps) => {
   return (
     <Navbar bg="dark" variant="dark" expand="lg" fixed="top" id="header2" ref={headerRef}>

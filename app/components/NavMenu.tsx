@@ -8,7 +8,9 @@ type NavMenuProps = {
   toggleShow: () => void;
 };
 
-/** 画面右からスライドインするナビゲーションメニュー(Home/About/Contact)。 */
+/**
+ * 画面右からスライドインするナビゲーションメニュー(Home/About/Contact)。
+ */
 export const NavMenu = ({ show, toggleShow }: NavMenuProps) => {
   return (
     <Offcanvas show={show} onHide={toggleShow} placement="end">
