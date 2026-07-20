@@ -7,12 +7,11 @@ import dynamic from 'next/dynamic';
 import { getRamdomColor } from './components/ColorFunctions';
 import { getRGBCodeFromRGB, getHexCodeFromRGB, getHSLCodeFromRGB } from './components/ColorFunctions';
 
-import { getSampleColors, getInitialComponents, getCurrentColor, getInitialComponentColor, 
-  getMaxSampleColorNo, setOneRGBHSV, setRGB, 
+import { getSampleColors, getInitialComponents, getCurrentColor, getInitialComponentColor,
+  getMaxSampleColorNo, setOneRGBHSV, setRGB,
   removeComponent,
   handleToggleColorButton,
-  getColorButtonStyle,
-  getShowColorSelector} from './components/ColorComponents';
+  getColorButtonStyle} from './components/ColorComponents';
 import { addCard, getInitialCardCount, removeCard } from './components/CardComponents';
 import { Component } from './types/Component';
 import { Color } from './types/Color';
@@ -32,8 +31,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
-import { faPalette, faBrush } from "@fortawesome/free-solid-svg-icons";
-import { ColorSelectors } from './components/ColorSelectors';
+import { faBrush } from "@fortawesome/free-solid-svg-icons";
+import { ColorSpacePanel, colorSpaceConfigs } from './components/ColorSpacePanel';
 
 const Wrapper = dynamic(() => import('./components/Wrapper'), { ssr: false });
 function App() {
@@ -759,218 +758,19 @@ function App() {
               {/* <Button variant="outline-secondary" size="sm" onClick={() => {handleToggleColorSelector()}}>{showColorSelector ? "隠す" : "表示"}</Button> */}
               <Row {...getShowAllColorSelector()}>
 
-                {/* 色変更バー */}
-                {/* RGB */}
-                <Col {...getShowColorSelector('rgb', showColorRGB, showColorHSV, showColorHSL, showColorCMYK)}>
-                  <Row className="my-2" id="rgb">
-
-                    <Row className='my-2'>
-                      <Col xs='auto'>
-                        <FontAwesomeIcon icon={faPalette} />
-                        <span className='color-space-name'>RGB</span>
-                      </Col>
-                    </Row>
-
-                      <ColorSelectors 
-                        text='R'
-                        id='rgb-r'
-                        color={getCurrentColor(components)}
-                        colorValue={Math.trunc(getCurrentColor(components).r)}
-                        colorRange={getCurrentColor(components).r}
-                        handleChangeRange={(e) => handleChangeRange(e, 'r')}
-                        min={0}
-                        max={255}
-                        step={1}
-                      />
-
-                      <ColorSelectors 
-                        text='G'
-                        id='rgb-g'
-                        color={getCurrentColor(components)}
-                        colorValue={Math.trunc(getCurrentColor(components).g)}
-                        colorRange={getCurrentColor(components).g}
-                        handleChangeRange={(e) => handleChangeRange(e, 'g')}
-                        min={0}
-                        max={255}
-                        step={1}
-                      />
-
-                    <ColorSelectors 
-                        text='B'
-                        id='rgb-b'
-                        color={getCurrentColor(components)}
-                        colorValue={Math.trunc(getCurrentColor(components).b)}
-                        colorRange={getCurrentColor(components).b}
-                        handleChangeRange={(e) => handleChangeRange(e, 'b')}
-                        min={0}
-                        max={255}
-                        step={1}
-                    />
-
-                  </Row>
-                </Col>
-
-                {/* HSV */}
-                <Col {...getShowColorSelector('hsv', showColorRGB, showColorHSV, showColorHSL, showColorCMYK)}>
-                  <Row className="my-2" id="hsv">
-
-                    <Row className='my-2'>
-                      <Col xs='auto'>
-                        <FontAwesomeIcon icon={faPalette} />
-                        <span className='color-space-name'>HSV</span>
-                      </Col>
-                    </Row>
-
-                      <ColorSelectors 
-                        text='H(色相)'
-                        id='hsv-h'
-                        color={getCurrentColor(components)}
-                        colorValue={Math.trunc(getCurrentColor(components).hsv_h)}
-                        colorRange={getCurrentColor(components).hsv_h}
-                        handleChangeRange={(e) => handleChangeRange(e, 'hsv_h')}
-                        min={0}
-                        max={359}
-                        step={0.0001}
-                      />
-
-                      <ColorSelectors 
-                        text='S(彩度)'
-                        id='hsv-s'
-                        color={getCurrentColor(components)}
-                        colorValue={Math.trunc(getCurrentColor(components).hsv_s * 1000) / 1000}
-                        colorRange={getCurrentColor(components).hsv_s}
-                        handleChangeRange={(e) => handleChangeRange(e, 'hsv_s')}
-                        min={0.0001}
-                        max={1.001}
-                        step={0.001}
-                      />
-
-                      <ColorSelectors 
-                        text='V(明度)'
-                        id='hsv-v'
-                        color={getCurrentColor(components)}
-                        colorValue={Math.trunc(getCurrentColor(components).hsv_v * 1000) / 1000}
-                        colorRange={getCurrentColor(components).hsv_v}
-                        handleChangeRange={(e) => handleChangeRange(e, 'hsv_v')}
-                        min={0.0001}
-                        max={1.001}
-                        step={0.001}
-                      />
-
-                  </Row>
-                </Col>
-
-                {/* HSL */}
-                <Col {...getShowColorSelector('hsl', showColorRGB, showColorHSV, showColorHSL, showColorCMYK)}>
-                  <Row className="my-2" id="hsl">
-
-                    <Row className='my-2'>
-                      <Col xs='auto'>
-                        <FontAwesomeIcon icon={faPalette} />
-                        <span className='color-space-name'>HSL</span>
-                      </Col>
-                    </Row>
-
-                    <ColorSelectors 
-                        text='H(色相)'
-                        id='hsl-h'
-                        color={getCurrentColor(components)}
-                        colorValue={Math.trunc(getCurrentColor(components).hsl_h)}
-                        colorRange={getCurrentColor(components).hsl_h}
-                        handleChangeRange={(e) => handleChangeRange(e, 'hsl_h')}
-                        min={0}
-                        max={359}
-                        step={0.0001}
-                      />
-
-                    <ColorSelectors 
-                        text='S(彩度)'
-                        id='hsl-s'
-                        color={getCurrentColor(components)}
-                        colorValue={Math.trunc(getCurrentColor(components).hsl_s * 1000) / 1000}
-                        colorRange={getCurrentColor(components).hsl_s}
-                        handleChangeRange={(e) => handleChangeRange(e, 'hsl_s')}
-                        min={0.0001}
-                        max={1.001}
-                        step={0.001}
-                      />
-
-                    <ColorSelectors 
-                        text='L(輝度)'
-                        id='hsl-l'
-                        color={getCurrentColor(components)}
-                        colorValue={Math.trunc(getCurrentColor(components).hsl_l * 1000) / 1000}
-                        colorRange={getCurrentColor(components).hsl_l}
-                        handleChangeRange={(e) => handleChangeRange(e, 'hsl_l')}
-                        min={0.0001}
-                        max={1.001}
-                        step={0.001}
-                      />
-                  </Row>
-                </Col>
-
-                {/* CMYK */}
-                <Col {...getShowColorSelector('cmyk', showColorRGB, showColorHSV, showColorHSL, showColorCMYK)}>
-                  <Row className="my-2" id="cmyk">
-
-                    <Row className='my-2'>
-                      <Col xs='auto'>
-                        <FontAwesomeIcon icon={faPalette} />
-                        <span className='color-space-name'>CMYK</span>
-                      </Col>
-                    </Row>
-
-                    <ColorSelectors 
-                        text='C'
-                        id='cmyk-c'
-                        color={getCurrentColor(components)}
-                        colorValue={Math.trunc(getCurrentColor(components).cmyk_c * 100)}
-                        colorRange={getCurrentColor(components).cmyk_c}
-                        handleChangeRange={(e) => handleChangeRange(e, 'cmyk_c')}
-                        min={0.0001}
-                        max={1.001}
-                        step={0.001}
-                      />
-
-                    <ColorSelectors 
-                        text='M'
-                        id='cmyk-m'
-                        color={getCurrentColor(components)}
-                        colorValue={Math.trunc(getCurrentColor(components).cmyk_m * 100)}
-                        colorRange={getCurrentColor(components).cmyk_m}
-                        handleChangeRange={(e) => handleChangeRange(e, 'cmyk_m')}
-                        min={0.0001}
-                        max={1.001}
-                        step={0.001}
-                      />
-
-                    <ColorSelectors 
-                        text='Y'
-                        id='cmyk-y'
-                        color={getCurrentColor(components)}
-                        colorValue={Math.trunc(getCurrentColor(components).cmyk_y * 100)}
-                        colorRange={getCurrentColor(components).cmyk_y}
-                        handleChangeRange={(e) => handleChangeRange(e, 'cmyk_y')}
-                        min={0.0001}
-                        max={1.001}
-                        step={0.001}
-                      />
-
-                    <ColorSelectors 
-                        text='K'
-                        id='cmyk-k'
-                        color={getCurrentColor(components)}
-                        colorValue={Math.trunc(getCurrentColor(components).cmyk_k * 100)}
-                        colorRange={getCurrentColor(components).cmyk_k}
-                        handleChangeRange={(e) => handleChangeRange(e, 'cmyk_k')}
-                        min={0.0001}
-                        max={1.001}
-                        step={0.001}
-                      />
-
-
-                  </Row>
-                </Col>
+                {/* 色変更バー(RGB/HSV/HSL/CMYK) */}
+                {colorSpaceConfigs.map((config) => (
+                  <ColorSpacePanel
+                    key={config.id}
+                    config={config}
+                    color={getCurrentColor(components)}
+                    handleChangeRange={handleChangeRange}
+                    showColorRGB={showColorRGB}
+                    showColorHSV={showColorHSV}
+                    showColorHSL={showColorHSL}
+                    showColorCMYK={showColorCMYK}
+                  />
+                ))}
 
               </Row>
             </Container>
