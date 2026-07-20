@@ -26,9 +26,6 @@ export const useColorEditor = () => {
   useEffect(() => {
       // localStrageに保存
       localStorage.setItem('components', JSON.stringify(components));
-
-      // 画面の高さを再計算
-      // setAppHeight(document.documentElement.clientHeight);
   }, [components]);
 
   // cardCountが変わるたびlocalStorageへ保存
@@ -45,14 +42,6 @@ export const useColorEditor = () => {
 
   // 設定をクリアする
   const resetPage = () => {
-    // localStorage.clear();
-
-    // setCardCount(getInitialCardCount());
-    // setComponents(getInitialComponents());
-    // setCurrentColors(getInitialCurrentColors());
-
-
-
     // componentsのcolorを全て初期化する
     components.map((component) => {
       component.color = getInitialComponentColor(component.id);
@@ -67,8 +56,6 @@ export const useColorEditor = () => {
   const handleChangeRange = (e: React.ChangeEvent<HTMLInputElement>, colorName: string) => {
     const colorValue = Number(e.target.value);
 
-    // console.log(colorValue);
-
     const clickedComonent = components.find((component) => component.isClick);
 
     if (clickedComonent === undefined) {
@@ -80,28 +67,6 @@ export const useColorEditor = () => {
     }
   }
 
-  // ※現状どこからも呼ばれていない(未使用)。削除するかは別途検討
-  const changeClickedColor = () => {
-
-    // console.log(getCurrentColor())
-
-    const deepCopy = components.map((component) => ({ ...component }));
-    // console.log(deepCopy);
-
-    const newComponents = deepCopy.map((component) => {
-      if (component.isClick) {
-        component.color = getCurrentColor(components);
-      }
-      if (component.id === currentColorId) {
-        // console.log('match')
-        component.color = getCurrentColor(components);
-      }
-      return component;
-    });
-
-    setComponents(newComponents);
-  }
-
   // idのcomponentが無ければ新規作成してcomponentsに追加する(あれば何もしない)
   const addComponent = (id: string,
     color: Color = getRamdomColor(uuidv4()),
@@ -111,9 +76,6 @@ export const useColorEditor = () => {
     // idを検索して、無ければオブジェクトを作成する
     let component;
     component = components.find((component) => component.id === id);
-
-
-    // console.log('addComponent id:' + id)
 
     if (component === undefined) {
       //新しいComponent作成
@@ -151,13 +113,6 @@ export const useColorEditor = () => {
           border: "solid",
           borderColor: "red",
         });
-      } else if (component.isHover) {
-        // ホバー時のstyleを追加
-        // Object.assign(style, {
-        //   border: "solid",
-        //   borderColor: "red",
-        //   cursor: "pointer",
-        // });
       }
 
       // 背景色が暗いときは、文字色を明るくする
@@ -173,7 +128,6 @@ export const useColorEditor = () => {
         const footerHeight = footerRef.current === null ? 0 : footerRef.current.clientHeight;
         const appHeight = appRef.current === null ? 0 : appRef.current.clientHeight;
         const bodyHeight = appHeight - (headerHeight + 12);
-        // const bodyHeight = bodyRef.current === null ? 0 : bodyRef.current.clientHeight;
 
         console.log('appHeight:' + appHeight)
         console.log('headerHeight:' + headerHeight)
@@ -223,51 +177,11 @@ export const useColorEditor = () => {
 
   }
 
-  // ※現状どこからも呼ばれていない(未使用)。削除するかは別途検討
-  const handleClickClear = () => {
-
-    const deepCopy = components.map((component) => ({ ...component }));
-    const newComponents = deepCopy.map((component) => {
-
-      // クリック時はhoverを解除
-      component.isHover = false;
-
-      component.isClick = false;
-
-      return component;
-    });
-
-    setComponents(newComponents);
-  }
-
-  // hover動作取得 ※現状どこからも呼ばれていない(未使用)。削除するかは別途検討
-  const handleHover = (id: string, isHover: boolean) => {
-    isHover
-    ? console.log('hoverStart:' + id)
-    : console.log('hoverEnd:' + id)
-
-    const deepCopy = components.map((component) => ({ ...component }));
-    // console.log(deepCopy);
-
-    const newComponents = deepCopy.map((component) => {
-      if (component.id === id) {
-        component.isHover = isHover;
-      } else {
-        component.isHover = false;
-      }
-      return component;
-    });
-
-    setComponents(newComponents);
-  }
-
   // refやstateではなくただのクロージャ変数。dragstart→dropが同一レンダー内で完結する前提で動いている(壊れやすいが既存動作のまま維持)
   let draggingColorId: string;
 
   const handleDragStart = (e: React.DragEvent<HTMLElement>, id: string) => {
     console.log('drag start');
-    // e.dataTransfer.effectAllowed = "copy";
-    // e.dataTransfer.setData("text/plain", id);
 
     // ドラッグ状態に変更
     console.log(id);
@@ -284,9 +198,6 @@ export const useColorEditor = () => {
 
   const handleDrop = (e: React.DragEvent<HTMLElement>, id: string) => {
     console.log('drop:' + id)
-    // console.log(e.currentTarget.id);
-    // console.log(e);
-    // console.log(e.dataTransfer.getData("text/plain"));
 
     console.log('---')
     console.log(getCurrentColor(components))
@@ -309,10 +220,6 @@ export const useColorEditor = () => {
 
       setComponents(newComponents);
     }
-
-    // e.dataTransfer.clearData('colorId');
-    // e.preventDefault(); // ブラウザの挙動をキャンセル
-    return;
   }
 
   return {
@@ -326,12 +233,9 @@ export const useColorEditor = () => {
     footerRef,
     resetPage,
     handleChangeRange,
-    changeClickedColor,
     addComponent,
     getColorStyle,
     handleClick,
-    handleClickClear,
-    handleHover,
     handleDragStart,
     handleDragOver,
     handleDrop,
