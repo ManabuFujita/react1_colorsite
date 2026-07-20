@@ -1,18 +1,17 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
 
-import { getRamdomColor } from './components/ColorFunctions';
 import { getRGBCodeFromRGB, getHexCodeFromRGB, getHSLCodeFromRGB } from './components/ColorFunctions';
 
-import { getSampleColors, getInitialComponents, getCurrentColor, getInitialComponentColor,
-  getMaxSampleColorNo, setOneRGBHSV, setRGB,
+import { getSampleColors, getCurrentColor, getInitialComponentColor,
   removeComponent,
   handleToggleColorButton,
   getColorButtonStyle} from './components/ColorComponents';
-import { addCard, getInitialCardCount, removeCard } from './components/CardComponents';
+import { addCard, removeCard } from './components/CardComponents';
+import { useColorEditor } from './components/useColorEditor';
 import { Component } from './types/Component';
 import { Color } from './types/Color';
 
@@ -44,13 +43,22 @@ function App() {
 
   const currentColorId = 'sample-color';
 
-
-
-  const [components, setComponents] = useState<Component[]>(getInitialComponents());
-
-  // const [currentColors, setCurrentColors] = useState<Color[]>(getInitialCurrentColors());
-
-  const [cardCount, setCardCount] = useState<number>(getInitialCardCount());
+  const {
+    components, setComponents,
+    cardCount, setCardCount,
+    appRef, headerRef, bodyRef, footerRef,
+    resetPage,
+    handleChangeRange,
+    changeClickedColor,
+    addComponent,
+    getColorStyle,
+    handleClick,
+    handleClickClear,
+    handleHover,
+    handleDragStart,
+    handleDragOver,
+    handleDrop,
+  } = useColorEditor();
 
   // const [appHeight, setAppHeight] = useState<number>(document.documentElement.clientHeight);
 
@@ -79,182 +87,6 @@ function App() {
   //   // localStrageに保存
   //   localStorage.setItem('currentColors', JSON.stringify(currentColors));
   // }, [currentColors]);
-
-  useEffect(() => {
-      // localStrageに保存
-      localStorage.setItem('components', JSON.stringify(components));
-
-      // 画面の高さを再計算
-      // setAppHeight(document.documentElement.clientHeight);
-  }, [components]);
-
-  useEffect(() => {
-    // localStrageに保存
-    localStorage.setItem('cardCount', JSON.stringify(cardCount));
-  }, [cardCount]);
-
-  
-
-  const appRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const bodyRef = useRef<HTMLDivElement>(null);  
-  const footerRef = useRef<HTMLDivElement>(null);
-
-
-  // 設定をクリアする
-  const resetPage = () => {
-    // localStorage.clear();
-
-    // setCardCount(getInitialCardCount());
-    // setComponents(getInitialComponents());
-    // setCurrentColors(getInitialCurrentColors());
-
-
-
-    // componentsのcolorを全て初期化する
-    components.map((component) => {
-      component.color = getInitialComponentColor(component.id);
-      console.log(component)
-    });
-
-    // cardcountを初期化する
-    setCardCount(1);
-  }
-
-
-
-  const handleChangeRange = (e: React.ChangeEvent<HTMLInputElement>, colorName: string) => {
-    const colorValue = Number(e.target.value);
-
-    // console.log(colorValue);
-
-    const clickedComonent = components.find((component) => component.isClick);
-
-    if (clickedComonent === undefined) {
-      // 色の設定値を変更(currentColorのみ)
-      setOneRGBHSV(colorName, colorValue, currentColorId, components, setComponents);
-    } else {
-      // 色の設定値を変更(clickcomponentとcurrentColorの両方)
-      setOneRGBHSV(colorName, colorValue, clickedComonent.id, components, setComponents);
-    }
-  }
-
-
-
-
-  const changeClickedColor = () => {
-
-    // console.log(getCurrentColor())
-
-    const deepCopy = components.map((component) => ({ ...component }));
-    // console.log(deepCopy);
-
-    const newComponents = deepCopy.map((component) => {
-      if (component.isClick) {
-        component.color = getCurrentColor(components);
-      }
-      if (component.id === currentColorId) {
-        // console.log('match')
-        component.color = getCurrentColor(components);
-      }
-      return component;
-    });
-
-    setComponents(newComponents);
-  }
-
-
-
-  const addComponent = (id: string, 
-    color: Color = getRamdomColor(uuidv4()), 
-    isCurrentColor: boolean = false, 
-    isSampleColor: boolean = false,) => {
-      
-    // idを検索して、無ければオブジェクトを作成する
-    let component;
-    component = components.find((component) => component.id === id);
-
-
-    // console.log('addComponent id:' + id)
-
-    if (component === undefined) {
-      //新しいComponent作成
-      const newComponent: Component = {
-        id: id,
-        isCurrentColor: isCurrentColor,
-        isSampleColor: isSampleColor,
-        isHover: false,
-        isClick: false,
-        isDrag: false,
-        color: color,
-        sampleColorNo: isSampleColor ? getMaxSampleColorNo(components) + 1 : -1,
-      };
-
-      setComponents([...components, newComponent]);
-    }
-  }
-
-  // const removeComponent = (id: string) => {
-  //   const newComponents = components.filter((component) => component.id !== id);
-      
-  //   setComponents(newComponents);
-  // }
-
-  const getColorStyle = (id: string) => {
-
-    // componentを検索
-    const component = components.find((component) => component.id === id);
-
-    let style = {
-      backgroundColor: 'gray', // 初期値
-      borderRadius: '0%',
-    };
-    if (component !== undefined) {
-      style.backgroundColor = getHexCodeFromRGB(component.color);
-
-      if (component.isClick) {
-        // クリック時のstyleを追加
-        Object.assign(style, { 
-          border: "solid",
-          borderColor: "red",
-        });
-      } else if (component.isHover) {
-        // ホバー時のstyleを追加
-        // Object.assign(style, { 
-        //   border: "solid",
-        //   borderColor: "red",
-        //   cursor: "pointer",
-        // });
-      }
-
-      // 背景色が暗いときは、文字色を明るくする
-      if (component.color.hsl_l < 0.65) {
-        Object.assign(style, { 
-          color: "white",
-        });
-      }
-
-      // body-backgroundの場合、高さを再計算してセットする
-      if (id === 'body-background') {
-        const headerHeight = headerRef.current === null ? 0 : headerRef.current.clientHeight;
-        const footerHeight = footerRef.current === null ? 0 : footerRef.current.clientHeight;
-        const appHeight = appRef.current === null ? 0 : appRef.current.clientHeight;
-        const bodyHeight = appHeight - (headerHeight + 12);
-        // const bodyHeight = bodyRef.current === null ? 0 : bodyRef.current.clientHeight;
-
-        console.log('appHeight:' + appHeight)
-        console.log('headerHeight:' + headerHeight)
-        console.log('footerHeight:' + footerHeight)
-        console.log('bodyHeight:' + bodyHeight)
-
-        Object.assign(style, { 
-          top: headerHeight,
-          minHeight: bodyHeight,
-        });
-      }
-    }
-    return style;
-  }
 
   const DivColor = ({...props}) => {
     console.log('DivColor')
@@ -371,129 +203,6 @@ function App() {
   };
 
 
-  // click動作取得
-  const handleClick = (e: React.MouseEvent<HTMLElement>, id: string) => {
-    
-    console.log('clickStart:' + id)
-
-    const deepCopy = components.map((component) => ({ ...component }));
-    const newComponents = deepCopy.map((component) => {
-      
-      // クリック時はhoverを解除
-      component.isHover = false;
-
-      if (component.id === id) {
-        component.isClick = !component.isClick; // トグル操作
-
-        // 選択したコンポーネントの色を入力欄にセット
-        setRGB(component.color, components, setComponents);
-
-      } else {
-        component.isClick = false;
-      }
-
-      return component;
-    });
-
-    setComponents(newComponents);
-
-
-    if (e !== undefined) {
-      e.preventDefault();
-      e.stopPropagation(); // 親要素への伝播を停止
-    }
-
-  }
-
-  const handleClickClear = () => {
-
-    const deepCopy = components.map((component) => ({ ...component }));
-    const newComponents = deepCopy.map((component) => {
-      
-      // クリック時はhoverを解除
-      component.isHover = false;
-
-      component.isClick = false;
-
-      return component;
-    });
-
-    setComponents(newComponents);
-  }
-
-  // hover動作取得
-  const handleHover = (id: string, isHover: boolean) => {
-    isHover 
-    ? console.log('hoverStart:' + id)
-    : console.log('hoverEnd:' + id)
-
-    const deepCopy = components.map((component) => ({ ...component }));
-    // console.log(deepCopy);
-
-    const newComponents = deepCopy.map((component) => {
-      if (component.id === id) {
-        component.isHover = isHover;
-      } else {
-        component.isHover = false;
-      }
-      return component;
-    });
-
-    setComponents(newComponents);
-  }
-
-  let draggingColorId: string;
-
-  const handleDragStart = (e: React.DragEvent<HTMLElement>, id: string) => {
-    console.log('drag start');
-    // e.dataTransfer.effectAllowed = "copy";
-    // e.dataTransfer.setData("text/plain", id);
-
-    // ドラッグ状態に変更
-    console.log(id);
-    draggingColorId = id;
-    console.log(draggingColorId);
-  }
-
-  const handleDragOver = (e: React.DragEvent<HTMLElement>, id: string) =>{
-    // ToDo:ドロップ可能な場所のみ、preventするようにしたい
-    // ↓参照
-    // https://developer.mozilla.org/ja/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#draggableattribute
-    e.preventDefault();
-  }
-
-  const handleDrop = (e: React.DragEvent<HTMLElement>, id: string) => {
-    console.log('drop:' + id)
-    // console.log(e.currentTarget.id);
-    // console.log(e);
-    // console.log(e.dataTransfer.getData("text/plain"));
-
-    console.log('---')
-    console.log(getCurrentColor(components))
-    console.log(draggingColorId)
-
-    // ドラッグした色を取得
-    const dragColor = components.find((currentColor) => currentColor.id === draggingColorId)?.color
-    console.log(dragColor)
-
-    if (dragColor !== undefined) {
-      const deepCopy = components.map((component) => ({ ...component }));
-      const newComponents = deepCopy.map((component) => {
-        if (component.id === id) {
-          component.color = dragColor;
-        } 
-        return component;
-      });
-
-      setComponents(newComponents);
-    }
-
-    // e.dataTransfer.clearData('colorId');
-    // e.preventDefault(); // ブラウザの挙動をキャンセル
-    return;
-  }
-
-  
   // const inputValueRef = useRef();
 
   const CopyButton = ({ copyText, inputId }: { copyText: string, inputId: string }) => {
