@@ -2,6 +2,10 @@ type ColorObject = {
   [key: string]: number | string;
 }
 
+/**
+ * RGB/HSV/HSL/CMYKの値をまとめて保持する色の型。
+ * いずれかの値が変更されるたびに、他の表色系の値も再計算して同期させる。
+ */
 export type Color = ColorObject & {
   id: string;
   r: number;

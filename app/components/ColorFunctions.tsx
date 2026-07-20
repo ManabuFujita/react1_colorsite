@@ -1,9 +1,11 @@
 "use client";
 
+/**
+ * RGB・HSV・HSL・CMYK間の相互変換と、rgb()/#hex/hsl()形式の文字列への変換を行うユーティリティ関数群。
+ */
+
 import { Color } from '../types/Color';
 
-
-// RGB to HSV
 const getHSV_H = (color: Color) => {
   const max = Math.max(color.r, color.g, color.b);
   const min = Math.min(color.r, color.g, color.b);
@@ -50,6 +52,9 @@ const getHSV_V = (color: Color) => {
   return v;
 }
 
+/**
+ * RGBの値からHSV(色相・彩度・明度)を計算し、colorに反映する。
+ */
 export const RGB2HSV = (color: Color) => {
   color['hsv_h'] = getHSV_H(color);
   color['hsv_s'] = getHSV_S(color);
@@ -57,7 +62,6 @@ export const RGB2HSV = (color: Color) => {
   return color;
 }
 
-// RGB to HSL
 const getHSL_H = (color: Color) => {
   const max = Math.max(color.r, color.g, color.b);
   const min = Math.min(color.r, color.g, color.b);
@@ -112,6 +116,9 @@ const getHSL_L = (color: Color) => {
   return l;
 }
 
+/**
+ * RGBの値からHSL(色相・彩度・輝度)を計算し、colorに反映する。
+ */
 export const RGB2HSL = (color: Color) => {
   color['hsl_h'] = getHSL_H(color);
   color['hsl_s'] = getHSL_S(color);
@@ -119,7 +126,6 @@ export const RGB2HSL = (color: Color) => {
   return color;
 }
 
-// RGB to CMYK
 const getCMYK_C = (color: Color) => {
   const k = getCMYK_K(color);
   const c = (1 - (color.r / 255) - k) / (1 - k);
@@ -144,6 +150,9 @@ const getCMYK_K = (color: Color) => {
   return k;
 }
 
+/**
+ * RGBの値からCMYK(シアン・マゼンタ・イエロー・黒)を計算し、colorに反映する。
+ */
 export const RGB2CMYK = (color: Color) => {
   color['cmyk_c'] = getCMYK_C(color);
   color['cmyk_m'] = getCMYK_M(color);
@@ -152,7 +161,9 @@ export const RGB2CMYK = (color: Color) => {
   return color;
 }
 
-// HSV to RGB
+/**
+ * HSVの値からRGBを計算し、colorに反映する。
+ */
 export const HSV2RGB = (color: Color) => {
   const max = color.hsv_v * 255;
   const min = max - (color.hsv_s * max);
@@ -191,7 +202,9 @@ export const HSV2RGB = (color: Color) => {
   return color;
 }
 
-// HSL to RGB
+/**
+ * HSLの値からRGBを計算し、colorに反映する。
+ */
 export const HSL2RGB = (color: Color) => {
   let min, max;
   if (color.hsl_l < 0.49) {
@@ -236,7 +249,9 @@ export const HSL2RGB = (color: Color) => {
   return color;
 }
 
-// CMYK to RGB
+/**
+ * CMYKの値からRGBを計算し、colorに反映する。
+ */
 export const CMYK2RGB = (color: Color) => {
   const r = 255 * (1 - color.cmyk_c) * (1 - color.cmyk_k);
   const g = 255 * (1 - color.cmyk_m) * (1 - color.cmyk_k);
@@ -249,6 +264,9 @@ export const CMYK2RGB = (color: Color) => {
   return color;
 }
 
+/**
+ * RGBの変更を受けて、HSV/HSL/CMYKの値を同期させたColorを返す。
+ */
 const newColorFromRGB = (color: Color): Color => {
 
   color = RGB2HSV(color);
@@ -258,6 +276,9 @@ const newColorFromRGB = (color: Color): Color => {
   return color;
 }
 
+/**
+ * HSVの変更を受けて、RGB/HSL/CMYKの値を同期させたColorを返す。
+ */
 const newColorFromHSV = (color: Color): Color => {
 
   color = HSV2RGB(color);
@@ -268,6 +289,9 @@ const newColorFromHSV = (color: Color): Color => {
   return color;
 }
 
+/**
+ * HSLの変更を受けて、RGB/HSV/CMYKの値を同期させたColorを返す。
+ */
 const newColorFromHSL = (color: Color): Color => {
 
   color = HSL2RGB(color);
@@ -278,6 +302,9 @@ const newColorFromHSL = (color: Color): Color => {
   return color;
 }
 
+/**
+ * CMYKの変更を受けて、RGB/HSV/HSLの値を同期させたColorを返す。
+ */
 const newColorFromCMYK = (color: Color): Color => {
 
   color = CMYK2RGB(color);
@@ -289,6 +316,9 @@ const newColorFromCMYK = (color: Color): Color => {
 }
 
 
+/**
+ * ランダムなRGB値を持つ新しいColorを生成する。
+ */
 export const getRamdomColor = (id: string) => {
   // 新しいColor作成
   let newColor: Color = {
@@ -317,6 +347,9 @@ export const getRamdomColor = (id: string) => {
   return newColor;
 }
 
+/**
+ * ランダムな明度のグレースケール(彩度0)のColorを生成する。
+ */
 export const getRamdomGrayScaleColor = (id: string): Color => {
   // 新しいColor作成
   let newColor: Color = {
@@ -344,6 +377,9 @@ export const getRamdomGrayScaleColor = (id: string): Color => {
   return newColor;
 }
 
+/**
+ * 白色のColorを生成する。
+ */
 export const getWhiteColor = (id: string): Color => {
   // 新しいColor作成
   let newColor: Color = {
@@ -370,6 +406,9 @@ export const getWhiteColor = (id: string): Color => {
   return newColor;
 }
 
+/**
+ * ランダムな色相・彩度で、明度が高い(白に近い)Colorを生成する。
+ */
 export const getHighLuminanceColor = (id: string) => {
   // 新しいColor作成
   let newColor: Color = {
@@ -398,6 +437,9 @@ export const getHighLuminanceColor = (id: string) => {
 }
 
 
+/**
+ * 変更された成分名(colorName)に応じて、他の表色系の値も再計算したColorを返す。
+ */
 export const changeColor = (colorName: string, color: Color): Color => {
   switch (colorName) {
     case 'r':
@@ -435,6 +477,9 @@ export const changeColor = (colorName: string, color: Color): Color => {
 
 
 
+/**
+ * colorをCSSの`rgb()`形式の文字列に変換する。
+ */
 export const getRGBCodeFromRGB = (color: Color) => {
   const displayColor = getDisplayColor(color);
   return (
@@ -442,6 +487,9 @@ export const getRGBCodeFromRGB = (color: Color) => {
   );
 }
 
+/**
+ * colorをCSSの`#hex`形式の文字列に変換する。
+ */
 export const getHexCodeFromRGB = (color: Color) => {
   const displayColor = getDisplayColor(color);
   return "#"
@@ -450,6 +498,9 @@ export const getHexCodeFromRGB = (color: Color) => {
     + Math.trunc(displayColor.b).toString(16).padStart(2, '0');
 };
 
+/**
+ * colorをCSSの`hsl()`形式の文字列に変換する。
+ */
 export const getHSLCodeFromRGB = (color: Color) => {
   const displayColor = getDisplayColor(color);
   return (
@@ -457,6 +508,9 @@ export const getHSLCodeFromRGB = (color: Color) => {
   );
 }
 
+/**
+ * 表示・コード変換用に、各値を扱いやすい桁数に丸めたColorを返す。
+ */
 const getDisplayColor = (color: Color) => {
   return {
     r: Math.trunc(color.r),

@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * componentsのstate操作(追加・削除・色の更新・選択状態の切り替え)と、
+ * RGB/HSV/HSL/CMYKパネルの表示切り替えに関するヘルパー関数群。
+ */
+
 import { Component } from '../types/Component';
 import { getRamdomColor, getRamdomGrayScaleColor, getWhiteColor, RGB2HSV, RGB2HSL } from '../components/ColorFunctions';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,7 +14,9 @@ import { changeColor } from '../components/ColorFunctions';
 
 const currentColorId = 'sample-color';
 
-// componentsからsample colorを取得する
+/**
+ * componentsの中から、保存済みサンプルカラー(isSampleColorがtrue)だけを抽出する。
+ */
 export const getSampleColors = (components: Component[]) => {
   let sampleColors = [];
 
@@ -23,7 +30,10 @@ export const getSampleColors = (components: Component[]) => {
   return sampleColors;
 }
 
-// componentの初期値を取得
+/**
+ * componentsの初期値を取得する。
+ * localStorageに保存済みのデータがあればそれを復元し、なければデフォルト値を返す。
+ */
 export const getInitialComponents = () => {
   console.log('・getInitialComponents')
 
@@ -46,7 +56,9 @@ export const getInitialComponents = () => {
   return components;
 }
 
-// componentsの初期値を取得
+/**
+ * 編集中の色(currentColor)を表すComponentの初期値を生成する。
+ */
 const getInitialCurrenctColorComponent = () => {
   const id = currentColorId;
   // 新しいColor作成
@@ -64,6 +76,9 @@ const getInitialCurrenctColorComponent = () => {
   return component;
 }
 
+/**
+ * 初期表示用の、ランダムなグレースケール色を持つサンプルカラーのComponentを生成する。
+ */
 const getInitialRamdomColorComponent = () => {
   const id = uuidv4();
   // 新しいColor作成
@@ -85,7 +100,10 @@ const getInitialRamdomColorComponent = () => {
 const initialComponentsValue: Component[] = [getInitialCurrenctColorComponent(), getInitialRamdomColorComponent()];
 
 
-// componentsからcurrentcolorを取得する
+/**
+ * componentsの中から、編集中の色(isCurrentColorがtrue)を取得する。
+ * 見つからない場合はデフォルトの初期色を返す。
+ */
 export const getCurrentColor = (components: Component[]): Color => {
   const currentColor = components.find((component) => component.isCurrentColor);
   if (currentColor === undefined) {
@@ -95,6 +113,10 @@ export const getCurrentColor = (components: Component[]): Color => {
   }
 }
 
+/**
+ * 指定したidのComponentに設定する初期色を返す。
+ * body-backgroundは白、それ以外はランダムなグレースケール色になる。
+ */
 export const getInitialComponentColor = (id: string): Color => {
   switch (id) {
     case 'body-background':
@@ -105,6 +127,9 @@ export const getInitialComponentColor = (id: string): Color => {
   }
 }
 
+/**
+ * 保存済みサンプルカラーの中で最大のsampleColorNoを取得する(新規サンプル追加時の採番に使用)。
+ */
 export const getMaxSampleColorNo = (components: Component[]) => {
   let maxSampleColorNo = 0;
   components.forEach((component) => {
@@ -116,7 +141,9 @@ export const getMaxSampleColorNo = (components: Component[]) => {
 }
 
 
-// sample colorにセットする
+/**
+ * 編集中の色(currentColor)のRGB値を更新し、HSV/HSLも合わせて再計算する。
+ */
 export const setRGB = (color: Color, components: Component[], setComponents: Dispatch<SetStateAction<Component[]>>) => {
   // console.log(currentColors)
 
@@ -135,11 +162,15 @@ export const setRGB = (color: Color, components: Component[], setComponents: Dis
   setComponents(newComponents);
 }
 
+/**
+ * componentId(または常にcurrentColor)に該当するcomponentについて、色の成分を1つ更新し、
+ * 他の表色系(RGB/HSV/HSL/CMYK)の値も合わせて再計算する。
+ */
 export const setOneRGBHSV = (colorName: string, colorValue: number, componentId: String, components: Component[], setComponents: Dispatch<SetStateAction<Component[]>>) => {
 
   const deepCopy = components.map((component) => ({ ...component }));
   const newComponent = deepCopy.map((component) => {
-    if (component.id === currentColorId || component.color.id === componentId) {
+    if (component.id === currentColorId || component.id === componentId) {
 
       let newColor = component.color;
       newColor[colorName] = colorValue;
@@ -152,14 +183,19 @@ export const setOneRGBHSV = (colorName: string, colorValue: number, componentId:
   setComponents(newComponent);
 }
 
+/**
+ * 指定したidのcomponentをcomponentsから削除する。
+ */
 export const removeComponent = (id: string, components: Component[], setComponents: Dispatch<SetStateAction<Component[]>>) => {
   const newComponents = components.filter((component) => component.id !== id);
     
   setComponents(newComponents);
 }
 
-// 各色の表示・非表示
-export const handleToggleColorButton = (buttonName: string, 
+/**
+ * RGB/HSV/HSL/CMYKパネルの表示切り替えボタンが押されたとき、該当するパネルの表示状態を反転させる。
+ */
+export const handleToggleColorButton = (buttonName: string,
   showColorRGB: boolean,
   showColorHSV: boolean,
   showColorHSL: boolean,
@@ -187,7 +223,10 @@ export const handleToggleColorButton = (buttonName: string,
   }
 }
 
-export const getColorButtonStyle = (buttonName: string, 
+/**
+ * RGB/HSV/HSL/CMYKパネルの表示切り替えボタンに、現在の表示状態に応じたスタイル(active)を付与する。
+ */
+export const getColorButtonStyle = (buttonName: string,
   showColorRGB: boolean,
   showColorHSV: boolean,
   showColorHSL: boolean,
@@ -212,7 +251,11 @@ export const getColorButtonStyle = (buttonName: string,
   // return showColorSelector ? '' : {style: {display: 'none' }}
 }
 
-export const getShowColorSelector = (ColorSelectorName: string, 
+/**
+ * RGB/HSV/HSL/CMYKパネルの表示状態の組み合わせに応じて、
+ * 各パネルの幅(xxl)や表示/非表示を決定するpropsを返す。
+ */
+export const getShowColorSelector = (ColorSelectorName: string,
   showColorRGB: boolean,
   showColorHSV: boolean,
   showColorHSL: boolean,
